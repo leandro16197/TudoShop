@@ -1,0 +1,47 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: shop-laravel-db
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_USER: bn_laravel
+      MYSQL_PASSWORD: secret
+      MYSQL_DATABASE: shopping
+    ports:
+      - "3309:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - laravel_network
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: shop-laravel-app
+    working_dir: /var/www
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src:/var/www
+    command: sh -c "php -S 0.0.0.0:8000 -t public"
+    depends_on:
+      - mysql
+    networks:
+      - laravel_network
+
+  composer:
+    image: composer:2
+    container_name: shop-laravel-composer
+    working_dir: /var/www
+    volumes:
+      - ./src:/var/www
+    networks:
+      - laravel_network
+
+volumes:
+  mysql_data:
+
+networks:
+  laravel_network:
+    driver: bridge
