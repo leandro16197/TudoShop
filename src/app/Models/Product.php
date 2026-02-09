@@ -30,4 +30,9 @@ class Product extends Model
     {
         return $this->hasOne(Imagen::class, 'producto_id')->oldest('id');
     }
+    public function categorias()
+    {
+        return $this->belongsToMany(Categoria::class, 'categoria_producto');
+    }
+
 }

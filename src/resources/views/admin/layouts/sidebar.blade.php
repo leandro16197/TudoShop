@@ -18,7 +18,7 @@
                         Productos
                         </a>
                     </li>
-                    <li><a href="#" class="nav-link ps-4">Categorías</a></li>
+                    <li><a href="{{ route('admin.categorias') }}" class="nav-link ps-4">Categorías</a></li>
                     <li><a href="#" class="nav-link ps-4">Marcas</a></li>
                 </ul>
             </div>

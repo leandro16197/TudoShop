@@ -109,7 +109,9 @@ class ProductosController extends Controller
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
-
+        $request->merge([
+            'active' => filter_var($request->active, FILTER_VALIDATE_BOOLEAN),
+        ]);
         $request->validate([
             'name'        => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -124,7 +126,7 @@ class ProductosController extends Controller
             'description' => $request->description,
             'price'       => $request->price,
             'stock'       => $request->stock,
-            'active'      => $request->has('active'),
+            'active'      => $request->active ?? false,
         ]);
 
    

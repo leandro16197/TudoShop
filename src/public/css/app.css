@@ -29,7 +29,7 @@ body {
 #sidebar {
     min-width: 260px;
     max-width: 260px;
-    height: 100vh;
+    height: 120vh;
     background: linear-gradient(180deg, #141423, #10101a);
     padding: 20px;
     box-shadow: 3px 0 15px rgba(0,0,0,0.4);
