@@ -29,8 +29,8 @@
         </div>
     </div>
 @endsection
-@include('admin.categorias.categorias-agregar')
-@include('admin.categorias.categorias-eliminar')
+@include('admin.productos.categorias.categorias-agregar')
+@include('admin.productos.categorias.categorias-eliminar')
 @push('scripts')
-    @include('admin.categorias.categoriasScript')
+    @include('admin.productos.categorias.categoriasScript')
 @endpush

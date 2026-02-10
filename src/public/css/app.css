@@ -17,6 +17,13 @@ body {
     backdrop-filter: blur(4px);
 }
 
+.modal {
+    display: none;
+}
+
+.modal.show {
+    display: block;
+}
 
 #loadingGif.show {
     display: flex;
@@ -199,4 +206,29 @@ table.dataTable td {
 
 .dropdown-item.text-danger:hover {
     background-color: rgba(220,53,69,0.15);
+}
+
+
+#sidebar > ul > li > .nav-link.active {
+    font-size: 1rem;    
+    font-weight: 600;
+}
+
+
+#sidebar .btn-toggle-nav .nav-link {
+    font-size: 0.85rem;   
+    padding-top: 6px;
+    padding-bottom: 6px;
+    opacity: 0.85;
+}
+
+
+#sidebar .btn-toggle-nav .nav-link.active {
+    font-size: 0.85rem;   
+    font-weight: 500;
+    opacity: 1;
+    background: linear-gradient(90deg, #3b82f6, #2563eb);
+    border-radius: 8px;
+    width: 65%;
+    padding-left: 28px;
 }

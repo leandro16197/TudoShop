@@ -8,18 +8,17 @@ use Illuminate\Http\Request;
 
 class CategoriasController extends Controller
 {   
-    protected $routePrefix = 'admin.categorias';
-    protected $viewPath = 'admin.categorias';
+     protected $viewPath = 'admin.productos.categorias';
 
     public function index(Request $request)
     {
         if ($request->ajax()) {
 
-            $products = Categoria::select('id', 'nombre')
+            $categoria = Categoria::select('id', 'nombre')
                 ->get();
 
             return response()->json([
-                'data' => $products
+                'data' => $categoria
             ]);
         }
 

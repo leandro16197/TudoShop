@@ -10,8 +10,7 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductosController extends Controller
 {
-    protected $routePrefix = 'admin.productos';
-    protected $viewPath = 'admin.productos';
+    protected $viewPath = 'admin.productos.productos';
 
 
     public function index(Request $request)
@@ -93,18 +92,6 @@ class ProductosController extends Controller
             'product' => $product,
         ]);
     }
-
-    public function show(Product $product)
-    {
-        return view("{$this->viewPath}.show", compact('product'));
-    }
-
-
-    public function edit(Product $product)
-    {
-        return view("{$this->viewPath}.edit", compact('product'));
-    }
-
     
     public function update(Request $request, $id)
     {
