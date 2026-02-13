@@ -23,6 +23,20 @@
                       rows="3"
                       placeholder="Descripción del producto"></textarea>
           </div>
+          <div class="mb-3">
+              <label class="form-label">Categoría</label>
+
+              <select name="categoria_id"
+                      id="productCategorias"
+                      class="form-select bg-dark text-light border-secondary">
+
+                  <option value="" selected disabled>
+                      Seleccione categoría
+                  </option>
+
+              </select>
+          </div>
+
 
           <div class="mb-3">
             <label class="form-label">Precio</label>
@@ -72,43 +86,39 @@
   </div>
 </div>
 @push('scripts')
-
 <script>
-$('#productImages').on('change', function () {
-    const preview = $('#imagePreview');
-    preview.html('');
+  $(document).ready(function () {
+    let categoriasSelect;
 
-    const files = this.files;
-    const maxSize = 5 * 1024 * 1024; 
+    function loadCategorias(selected = null) {
+        $.get("{{ route('admin.categorias.list') }}", function (response) {
 
-    for (let file of files) {
-        if (file.size > maxSize) {
-            appCustom.smallBox(
-                'nok',
-                `La imagen "${file.name}" supera los 5MB`,
-                null,
-                4000
-            );
-
-            this.value = '';
-            preview.html('');
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            preview.append(`
-                <div class="col-4 mb-2">
-                    <img src="${e.target.result}"
-                         class="img-fluid rounded border border-secondary"
-                         style="max-height:120px; object-fit:cover;">
-                </div>
+            let select = $('#productCategorias');
+            select.html(`
+                <option value="" disabled ${!selected ? 'selected' : ''}>
+                    Seleccione categoría
+                </option>
             `);
-        };
-        reader.readAsDataURL(file);
+
+            response.data.forEach(cat => {
+
+                let isSelected = selected == cat.id ? 'selected' : '';
+
+                select.append(`
+                    <option value="${cat.id}" ${isSelected}>
+                        ${cat.nombre}
+                    </option>
+                `);
+            });
+
+        });
     }
-});
+
+    $('#createProductModal').on('shown.bs.modal', function () {
+        loadCategorias();
+    });
+
+  });
 
 </script>
-
 @endpush

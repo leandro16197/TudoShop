@@ -21,6 +21,7 @@
                     <tr>
                         <th>ID</th>
                         <th>Nombre</th>
+                        <th>Imagen</th>
                         <th style="width: 155px !important;">Acciones</th>
                     </tr>
                 </thead>

@@ -86,7 +86,7 @@ body {
 
 
 .navbar {
-    background-color: #151521 !important;
+    background-color:  rgb(26 44 63) !important;;
     border-bottom: 1px solid #2b2d3a;
 }
 
@@ -231,4 +231,26 @@ table.dataTable td {
     border-radius: 8px;
     width: 65%;
     padding-left: 28px;
+}
+
+.dataTables_scrollBody {
+    background-color: #212529 !important; 
+}
+
+
+.dataTables_scrollBody::-webkit-scrollbar {
+    width: 8px;
+}
+
+.dataTables_scrollBody::-webkit-scrollbar-track {
+    background: #212529;
+}
+
+.dataTables_scrollBody::-webkit-scrollbar-thumb {
+    background-color: #495057;
+    border-radius: 6px;
+}
+
+.dataTables_scrollBody::-webkit-scrollbar-thumb:hover {
+    background-color: #6c757d;
 }

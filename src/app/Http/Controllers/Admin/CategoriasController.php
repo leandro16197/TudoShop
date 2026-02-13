@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Categoria;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CategoriasController extends Controller
 {   
@@ -14,11 +15,21 @@ class CategoriasController extends Controller
     {
         if ($request->ajax()) {
 
-            $categoria = Categoria::select('id', 'nombre')
-                ->get();
+            $categorias = Categoria::select('id', 'nombre', 'imagen')
+                ->get()
+                ->map(function ($categoria) {
+
+                    return [
+                        'id' => $categoria->id,
+                        'nombre' => $categoria->nombre,
+                        'imagen' => $categoria->imagen
+                            ? asset('storage/' . $categoria->imagen)
+                            : null,
+                    ];
+                });
 
             return response()->json([
-                'data' => $categoria
+                'data' => $categorias
             ]);
         }
 
@@ -26,30 +37,57 @@ class CategoriasController extends Controller
     }
 
     public function store(Request $request)
-    {
+    {  
         $request->validate([
             'nombre' => 'required|string|max:255',
+            'images.*'     => 'nullable|image|max:5120',
         ]);
 
-        if ($request->filled('id')) {
-            $categoria = Categoria::findOrFail($request->id);
-            $categoria->update([
-                'nombre' => $request->nombre,
-            ]);
+        $data = [
+            'nombre' => $request->nombre,
+        ];
 
-            return response()->json([
-                'status' => 'ok',
-                'message' => 'Categoría actualizada correctamente',
-            ]);
+        if ($request->hasFile('imagen')) {
+            $data['imagen'] = $request->file('imagen')
+                ->store('categorias', 'public');
         }
 
-        Categoria::create([
-            'nombre' => $request->nombre,
-        ]);
+        Categoria::create($data);
 
         return response()->json([
             'status' => 'ok',
             'message' => 'Categoría creada correctamente',
+        ]);
+    }
+
+    public function update(Request $request, $id)
+    {   
+        $request->validate([
+            'nombre' => 'required|string|max:255',
+            'images.*'     => 'nullable|image|max:5120',
+        ]);
+        $categoria = Categoria::findOrFail($id);
+
+        $data = [
+            'nombre' => $request->nombre,
+        ];
+
+        if ($request->hasFile('imagen')) {
+            if ($categoria->imagen &&
+                Storage::disk('public')->exists($categoria->imagen)) {
+
+                Storage::disk('public')->delete($categoria->imagen);
+            }
+
+            $data['imagen'] = $request->file('imagen')
+                ->store('categorias', 'public');
+        }
+
+        $categoria->update($data);
+
+        return response()->json([
+            'status' => 'ok',
+            'message' => 'Categoría actualizada correctamente',
         ]);
     }
 
@@ -62,6 +100,14 @@ class CategoriasController extends Controller
         return response()->json([
             'status' => 'ok',
             'message' => 'Categoría eliminada correctamente'
+        ]);
+    }
+    public function lista()
+    {
+        $categorias = Categoria::select('id', 'nombre')->get();
+
+        return response()->json([
+            'data' => $categorias
         ]);
     }
 }

@@ -17,7 +17,9 @@
           id="formCreateCategory"
           action="{{ route('admin.categorias.store') }}"
           method="POST"
+          enctype="multipart/form-data"
         >
+
           @csrf
 
           <div class="mb-3">
@@ -30,6 +32,19 @@
               required
             >
           </div>
+          <div class="mb-3">
+            <label class="form-label">Imagen de la categoría</label>
+            <input
+              type="file"
+              class="form-control bg-dark text-light border-secondary"
+              id="categoryImage"
+              name="imagen"
+              accept=".jpg,.jpeg,.png,.webp"
+            >
+          </div>
+
+          <div class="row" id="categoryImagePreview"></div>
+
 
           <div class="text-end">
             <button type="submit" class="btn btn-primary">
@@ -43,3 +58,4 @@
     </div>
   </div>
 </div>
+

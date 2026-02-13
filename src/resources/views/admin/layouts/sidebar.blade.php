@@ -5,8 +5,8 @@
         request()->routeIs('admin.categorias*') ||
         request()->routeIs('admin.marcas*');
 
-    $promocionesActive =
-        request()->routeIs('admin.promociones.ofertas*');
+    $promocionesActive = request()->routeIs('admin.promociones.ofertas*');
+    $marcasActive = request()->routeIs('admin.marcas*');
 @endphp
 
 <div id="sidebar" class="d-flex flex-column p-3 ">
@@ -45,10 +45,9 @@
                             Categorías
                         </a>
                     </li>
-
                     <li>
-                        <a href="#"
-                           class="nav-link ps-4">
+                        <a href="{{ route('admin.marcas') }}"
+                        class="nav-link ps-4 {{ $marcasActive ? 'active' : '' }}">
                             Marcas
                         </a>
                     </li>
@@ -84,7 +83,7 @@
         </li>
 
         <li class="nav-item">
-            <a class="nav-link" href="#">
+            <a class="nav-link " href="#">
                 Usuarios
             </a>
         </li>

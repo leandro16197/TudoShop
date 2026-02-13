@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\CategoriaProducto;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Imagen;
@@ -17,7 +18,7 @@ class ProductosController extends Controller
     {
         if ($request->ajax()) {
 
-            $products = Product::with('imagenPrincipal')
+            $products = Product::with(['imagenPrincipal', 'categorias'])
                 ->select('id', 'name', 'description', 'price', 'stock', 'active')
                 ->get()
                 ->map(function ($product) {
@@ -31,6 +32,10 @@ class ProductosController extends Controller
                         'image' => $product->imagenPrincipal
                                     ? asset('storage/'.$product->imagenPrincipal->imagen)
                                     : null,
+
+                        'categorias' => $product->categorias
+                            ->pluck('nombre')
+                            ->implode(', '),
                     ];
                 });
 
@@ -44,6 +49,7 @@ class ProductosController extends Controller
 
 
 
+
     public function create()
     {
         return view("{$this->viewPath}.create");
@@ -51,16 +57,15 @@ class ProductosController extends Controller
 
     public function store(Request $request)
     {
-
         $request->validate([
-            'name'        => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price'       => 'required|numeric|min:0',
-            'stock'       => 'required|integer|min:0',
-            'active'      => 'nullable|boolean',
-            'images.*'    => 'nullable|image|max:5120', 
+            'name'         => 'required|string|max:255',
+            'description'  => 'nullable|string',
+            'price'        => 'required|numeric|min:0',
+            'stock'        => 'required|integer|min:0',
+            'active'       => 'nullable|boolean',
+            'categoria_id' => 'required|exists:categorias,id',
+            'images.*'     => 'nullable|image|max:5120',
         ]);
-
 
         $product = Product::create([
             'name'        => $request->name,
@@ -69,14 +74,19 @@ class ProductosController extends Controller
             'stock'       => $request->stock,
             'active'      => $request->has('active'),
         ]);
+        CategoriaProducto::where('producto_id', $product->id)
+            ->delete();
 
+        CategoriaProducto::create([
+            'producto_id'  => $product->id,
+            'categoria_id' => $request->categoria_id,
+        ]);
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
 
                 $path = $image->store('productos', 'public');
 
- 
                 Imagen::create([
                     'producto_id' => $product->id,
                     'imagen'      => $path,
@@ -84,28 +94,32 @@ class ProductosController extends Controller
             }
         }
 
-        $product->load('imagenes');
+        $product->load(['imagenes', 'categorias']);
 
         return response()->json([
-            'status' => 'ok',
+            'status'  => 'ok',
             'message' => 'Producto creado correctamente',
             'product' => $product,
         ]);
     }
+
     
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
+
         $request->merge([
             'active' => filter_var($request->active, FILTER_VALIDATE_BOOLEAN),
         ]);
+
         $request->validate([
-            'name'        => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price'       => 'required|numeric|min:0',
-            'stock'       => 'required|integer|min:0',
-            'active'      => 'nullable|boolean',
-            'images.*'    => 'nullable|image|max:5120',
+            'name'         => 'required|string|max:255',
+            'description'  => 'nullable|string',
+            'price'        => 'required|numeric|min:0',
+            'stock'        => 'required|integer|min:0',
+            'active'       => 'nullable|boolean',
+            'categoria_id' => 'required|exists:categorias,id',
+            'images.*'     => 'nullable|image|max:5120',
         ]);
 
         $product->update([
@@ -116,10 +130,14 @@ class ProductosController extends Controller
             'active'      => $request->active ?? false,
         ]);
 
-   
+
+
+        $product->categorias()->sync([$request->categoria_id]);
+
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 $path = $image->store('productos', 'public');
+
                 Imagen::create([
                     'producto_id' => $product->id,
                     'imagen'      => $path,
@@ -127,8 +145,7 @@ class ProductosController extends Controller
             }
         }
 
-        $product->load('imagenes');
-
+        $product->load(['imagenes', 'categorias']);
 
         return response()->json([
             'status'  => 'ok',
@@ -136,6 +153,7 @@ class ProductosController extends Controller
             'product' => $product,
         ]);
     }
+
 
 
     public function destroy($id)

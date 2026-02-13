@@ -10,23 +10,18 @@
 </style>
 @section('content')
     <div class="d-flex justify-content-end mb-3">
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createProductModal">
-            <i class="bi bi-plus-lg"></i> Nuevo Producto
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createMarcaModal">
+            <i class="bi bi-plus-lg"></i> Nueva Marca
         </button>
     </div>
     <div class="card shadow-sm">
         <div class="card-body">
-            <table id="productsTable" data-url="{{ route('admin.productos.productos') }}" style="width: 100%">
+            <table id="marcasTable" data-url="{{ route('admin.marcas') }}" style="width: 100%">
                 <thead>
                     <tr>
                         <th>ID</th>
                         <th>Nombre</th>
                         <th>Imagen</th>
-                        <th>Descripción</th>
-                        <th>Categoría</th>
-                        <th>Precio</th>
-                        <th>Stock</th>
-                        <th>Activo</th>
                         <th style="width: 155px !important;">Acciones</th>
                     </tr>
                 </thead>
@@ -35,8 +30,8 @@
         </div>
     </div>
 @endsection
-@include('admin.productos.productos.productos-agregar')
-@include('admin.productos.productos.productos-eliminar')
+@include('admin.productos.marcas.marcas-agregar')
+@include('admin.productos.marcas.marcas-eliminar')
 @push('scripts')
-@include('admin.productos.productos.productosScript')
+@include('admin.productos.marcas.marcasScript')
 @endpush

@@ -32,7 +32,12 @@ class Product extends Model
     }
     public function categorias()
     {
-        return $this->belongsToMany(Categoria::class, 'categoria_producto');
+        return $this->belongsToMany(
+            Categoria::class,
+            'categoria_producto',
+            'producto_id',
+            'categoria_id'
+        );
     }
-
+    
 }

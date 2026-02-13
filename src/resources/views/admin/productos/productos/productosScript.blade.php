@@ -18,7 +18,9 @@
         var table = $('#productsTable').DataTable({
             responsive: true,
             language: { url: "/js/es-ES.json" },
-
+            scrollY: "500px",   
+            scrollCollapse: true,  
+            paging: true,  
             ajax: {
                 url: $('#productsTable').data('url'),
                 type: 'GET',
@@ -55,13 +57,29 @@
                     data: 'image',
                     searchable: false,
                     orderable: false,
+                    className: 'text-center',
                     render: img =>
                         img
-                            ? `<img src="${img}" style="width:40px;height:40px;object-fit:cover;border-radius:6px">`
+                            ? `
+                                <div style="width:110px;height:80px;display:flex;align-items:center;justify-content:center;border-radius:8px;padding:6px;
+                                ">
+                                    <img src="${img}"
+                                        style="
+                                            max-width:100%;
+                                            max-height:100%;
+                                            object-fit:contain;
+                                        ">
+                                </div>
+                            `
                             : '<span class="text-muted">—</span>'
                 },
                 {
                     data: 'description',
+                    searchable: false,
+                    defaultContent: '-'
+                },
+                {
+                    data: 'categorias',
                     searchable: false,
                     defaultContent: '-'
                 },
@@ -177,7 +195,7 @@
                         msg = xhr.responseJSON.message;
                     }
 
-                    appCustom.smallBox('nok', msg, null, 'NO_TIME_OUT');
+                    appCustom.smallBox('nok', msg, null,  3000);
                 },
                 complete: function () {
                     form.reset();
@@ -280,8 +298,41 @@
             $('#createProductModalLabel').text('Nuevo Producto');
         });
 
+        $('#productImages').on('change', function () {
+            const preview = $('#imagePreview');
+            preview.html('');
 
+            const files = this.files;
+            const maxSize = 5 * 1024 * 1024; 
 
+            for (let file of files) {
+                if (file.size > maxSize) {
+                    appCustom.smallBox(
+                        'nok',
+                        `La imagen "${file.name}" supera los 5MB`,
+                        null,
+                        4000
+                    );
+
+                    this.value = '';
+                    preview.html('');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    preview.append(`
+                        <div class="col-4 mb-2">
+                            <img src="${e.target.result}"
+                                class="img-fluid rounded border border-secondary"
+                                style="max-height:120px; object-fit:cover;">
+                        </div>
+                    `);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
     });
 
 </script>
