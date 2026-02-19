@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CategoriasController ;
 use App\Http\Controllers\Admin\MarcaController;
 use App\Http\Controllers\Admin\OfertaController ;
 use App\Http\Controllers\Fe\ProductosController as FeProductosController;
+use App\Http\Controllers\Fe\FeCategoriasController as FeCategoriasController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +22,8 @@ Route::prefix('home')->group(function () {
 Route::prefix('frontend/v1')->group(function () {
     Route::get('productos', [FeProductosController::class, 'search']);
     Route::get('productos/{id}', [FeProductosController::class, 'detail']);
+    Route::get('categorias', [FeCategoriasController::class, 'index']);
+    Route::get('destacados', [FeProductosController::class, 'featured']);
 });
 
 /*

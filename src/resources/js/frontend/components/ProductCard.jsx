@@ -1,25 +1,34 @@
 import React from 'react';
-
 import { Link } from 'react-router-dom';
 
-export default function ProductCard({ product }) {
+// Agregamos isCarousel con valor por defecto false
+export default function ProductCard({ product, loading, isCarousel = false }) {
+    if (loading) return <div className="skeleton">Cargando...</div>;
+
+    const cardClass = isCarousel ? "product-card is-featured" : "product-card";
+
     return (
-        <Link
-            to={`/productos/${product.id}`}
-            className="product-card"
-            style={{ textDecoration: 'none', color: 'inherit' }}
-        >
-            <h5>{product.name}</h5>
-            <p>{product.description || 'Sin descripción'}</p>
+        <Link to={`/productos/${product.id}`} className={cardClass}>
+            {product.imagen && (
+                <div className="product-image-container">
+                    <img
+                        src={product.imagen}
+                        alt={product.nombre}
+                        className="product-image"
+                    />
+                </div>
+            )}
 
-            <div className="product-footer">
-                <span>${parseFloat(product.price).toFixed(2)}</span>
+            <div className="product-info">
+                <h5>{product.nombre}</h5>
+                <p className="description">{product.descripcion || 'Sin descripción'}</p>
 
-                {product.active ? (
-                    <span className="badge badge-success">Disponible</span>
-                ) : (
-                    <span className="badge badge-secondary">Agotado</span>
-                )}
+                <div className="product-footer">
+                    <span className="price">${parseFloat(product.precio).toFixed(2)}</span>
+                    <span className={`badge ${product.activo ? 'available' : 'out'}`}>
+                        {product.activo ? 'Disponible' : 'Agotado'}
+                    </span>
+                </div>
             </div>
         </Link>
     );

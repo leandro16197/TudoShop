@@ -9,22 +9,18 @@ import "../../css/app.css";
 
 export default function App() {
   const [results, setResults] = useState([]);
-
+  const [loading, setLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+  const handleResults = (data, searched) => { setResults(data);setHasSearched(searched);};
   return (
     <BrowserRouter>
-      <Navbar onResults={setResults} />
+      <Navbar onResults={handleResults} onLoading={setLoading}/>
 
       <main className="app-content">
         <Routes>
-          <Route
-            path="/"
-            element={<Home results={results} />}
-          />
-
-          <Route
-            path="/productos/:id"
-            element={<ProductDetail />}
-          />
+          <Route path="/" element={<Home results={results} loading={loading} hasSearched={hasSearched} />} />
+          <Route path="/home"  element={<Home results={results} loading={loading} hasSearched={hasSearched} />} />
+          <Route path="/productos/:id" element={<ProductDetail />} />
         </Routes>
       </main>
     </BrowserRouter>

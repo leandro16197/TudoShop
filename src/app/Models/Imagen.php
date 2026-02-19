@@ -28,4 +28,9 @@ class Imagen extends Model
     {
         return asset('storage/' . $this->imagen);
     }
+    
+    public function imagenes()
+    {
+        return $this->hasMany(Imagen::class, 'producto_id');
+    }
 }

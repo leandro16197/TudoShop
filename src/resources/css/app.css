@@ -9,17 +9,17 @@ body {
     margin: 0;
 }
 
-/* =========================
-   NAVBAR
-========================= */
 .navbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background-color: rgb(222, 224, 73);;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+
+    background: linear-gradient(90deg, #4e73df, #6c8cff);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+
     padding: 0.8rem 2rem;
-    border-radius: 0 0 12px 12px;
+    border-radius: 0 0 16px 16px;
+
     position: fixed;
     top: 0;
     left: 0;
@@ -35,64 +35,74 @@ body {
     align-items: center;
 }
 
-.navbar-brand {
-    font-weight: 700;
-    font-size: 1.5rem;
-    color: #333333;
-}
-
-/* Centro: search */
 .navbar-center {
     flex: 1;
     justify-content: center;
+    position: relative; /* referencia para dropdown */
 }
 
+/* Input de búsqueda */
 .navbar-center input {
     border-radius: 50px;
-    border: 1px solid #ddd;
-    padding: 0.6rem 1rem;
-    width: 16%;
-    max-width: 400px;
-    transition: all 0.3s ease;
+    border: none;
+    padding: 0.65rem 1.2rem;
+    width: 100%;
+    max-width: 420px;
+    background: white;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    transition: all 0.25s ease;
 }
 
 .navbar-center input:focus {
     outline: none;
-    border-color: #6c63ff;
-    box-shadow: 0 0 8px rgba(108, 99, 255, 0.2);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
 }
 
-
-/* Wrapper centrado debajo del navbar */
+/* Dropdown de resultados */
 .results-wrapper {
-    position: absolute;
-    left: 52%;
-    width: 14%;
-    transform: translateX(-50%);
-    z-index: 1000;
+    position: absolute;     
+    top: 110%;           
+    width: 100%;
+    max-width: 420px;
+    z-index: 2000;
 }
 
-.search-wrapper {
-    position: relative;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-}
-/* Lista de productos (mismo ancho que search) */
+/* Lista de productos dentro del dropdown */
 .product-list-container {
-    width: 100%;
-    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+
     background: #ffffff;
     border-radius: 16px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.12);
     padding: 1rem;
 
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-
-    max-height: 450px;
+    max-height: 400px;     
     overflow-y: auto;
+}
+
+/* Items de búsqueda */
+.search-item {
+    padding: 0.8rem 1rem;
+    cursor: pointer;
+    text-decoration: none;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.search-item:hover {
+    background: #f3f3f3;
+}
+
+/* Opcional: ocultar scrollbar si quieres estilo limpio */
+.product-list-container::-webkit-scrollbar {
+    width: 6px;
+}
+.product-list-container::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.2);
+    border-radius: 3px;
 }
 
 /* =========================
@@ -412,4 +422,207 @@ body {
 .thumbs img.thumb.active {
     border-color: #16a34a;
     opacity: 1;
+}
+
+/*Categorias*/
+/* ===== Sección ===== */
+.categories-section {
+  padding: 60px 80px;
+  background: #f8f9fb;
+}
+
+.categories-title {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 40px;
+  text-align: center;
+  color: #2c2c2c;
+}
+
+/* ===== Grid ===== */
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 30px;
+}
+
+/* ===== Card ===== */
+.category-card {
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.category-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* ===== Imagen ===== */
+.category-image-wrapper {
+  position: relative;
+  height: 160px;
+  overflow: hidden;
+}
+
+.category-image-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.category-card:hover img {
+  transform: scale(1.08);
+}
+
+
+.category-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.3), transparent);
+}
+
+.category-name {
+  padding: 20px;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+  color: #333;
+}
+
+/* ===== Sección ===== */
+.featured-section {
+  padding: 60px 80px;
+  background: #ffffff;
+}
+
+.featured-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.featured-header h2 {
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.catalog-btn {
+  background: #6c63ff;
+  color: white;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.catalog-btn:hover {
+  background: #574fd6;
+}
+/* ===== Carrusel ===== */
+.featured-section {
+  padding: 40px 20px; 
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.carousel-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  padding: 0 10px; 
+}
+
+.carousel {
+  display: flex;
+  gap: 25px; 
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  padding: 20px 0; 
+}
+
+.carousel::-webkit-scrollbar {
+  display: none; 
+}
+
+.carousel-item {
+  
+  flex: 0 0 280px; 
+  transition: transform 0.3s ease;
+}
+
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #ffffff;
+  border: 1px solid #eee;
+  font-size: 24px;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.carousel-btn:hover {
+  background: #f8f8f8;
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+}
+
+.carousel-btn.left {
+  left: -15px;
+}
+
+.carousel-btn.right {
+  right: -15px;
+}
+/* Estilo para la tarjeta normal (catálogo) */
+.product-card .product-image {
+    width: 20%; /* Mantenemos tu diseño original */
+}
+
+/* Estilo especial para el Carrusel */
+.product-card.is-featured {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    height: 100%;
+    background: white;
+}
+
+.product-card.is-featured .product-image-container {
+    width: 100%;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.product-card.is-featured .product-image {
+    width: 100% !important; /* Forzamos el 100% solo en el carrusel */
+    height: 100%;
+    object-fit: contain; /* Para que la mochila no se deforme */
+}
+
+.product-info h5 {
+    font-size: 1.1rem;
+    margin: 5px 0;
 }

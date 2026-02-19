@@ -12,17 +12,32 @@ class ProductosController extends Controller
     {
         $query = $request->input('q', '');
 
-        $products = Product::query()
+        $productos = Product::with('imagenPrincipal')
             ->when($query, function ($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%")
-                  ->orWhere('description', 'like', "%{$query}%");
+                ->orWhere('description', 'like', "%{$query}%");
             })
             ->orderBy('name', 'asc')
             ->limit(10)
-            ->get(['id', 'name', 'description', 'price', 'stock', 'active']);
+            ->get()
+            ->map(function ($producto) {
+                $imagen = $producto->imagenPrincipal
+                    ? asset('storage/' . $producto->imagenPrincipal->imagen)
+                    : null;
 
-        return response()->json($products);
+                return [
+                    'id' => $producto->id,
+                    'nombre' => $producto->name,
+                    'descripcion' => $producto->description,
+                    'precio' => (float) $producto->price,
+                    'activo' => (bool) $producto->active,
+                    'imagen' => $imagen,
+                ];
+            });
+
+        return response()->json($productos);
     }
+
 
     public function detail($id)
     {
@@ -42,5 +57,31 @@ class ProductosController extends Controller
             ],
         ]);
     }
+
+    public function featured()
+    {
+        $productos = Product::with('imagenPrincipal')
+            ->where('active', 1)
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get()
+            ->map(function ($producto) {
+
+                $imagen = $producto->imagenPrincipal
+                    ? asset('storage/' . $producto->imagenPrincipal->imagen)
+                    : null;
+
+                return [
+                    'id' => $producto->id,
+                    'nombre' => $producto->name,
+                    'precio' => (float) $producto->price,
+                    'imagen' => $imagen,
+                ];
+            });
+
+        return response()->json($productos);
+    }
+
+
 
 }
