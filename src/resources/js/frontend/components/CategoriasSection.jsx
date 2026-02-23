@@ -5,7 +5,7 @@ export default function CategoriesSection() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/frontend/v1/categorias")
+     fetch("api/frontend/v1/categorias")
       .then(res => res.json())
       .then(data => {
         setCategories(data);
@@ -15,11 +15,15 @@ export default function CategoriesSection() {
       })
       .finally(() => setLoading(false));
   }, []);
-
+  
   if (loading) {
-    return <p style={{ textAlign: "center" }}>Cargando categorías...</p>;
+        return (
+            <div className="loading-container">
+                <div className="spinner"></div>
+                <p>Cargando</p>
+            </div>
+        );
   }
-
   return (
     <div className="categories-section">
       <h2 className="categories-title">Explorar Categorías</h2>

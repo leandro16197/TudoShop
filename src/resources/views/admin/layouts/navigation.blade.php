@@ -2,9 +2,13 @@
   <div class="container-fluid position-relative">
     
     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-      <li class="nav-item">
-        <a class="nav-link active" href="{{ route('dashboard') }}">ShopTudo</a>
-      </li>
+        <li class="nav-item d-flex align-items-center">
+            <a class="nav-link active" href="{{ route('dashboard') }}">
+                <img src="{{ asset('images/logoShopTudo.png') }}" 
+                    alt="ShopTudo Logo" 
+                    class="navbar-logo">
+            </a>
+        </li>
     </ul>
 
 

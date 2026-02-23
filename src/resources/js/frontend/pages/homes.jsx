@@ -4,6 +4,7 @@ import HeroBanner from "../components/HeroBanner";
 import CategoriasSection from "../components/CategoriasSection";
 import FeaturedProductsCarousel from "../components/FeaturedProductsCarousel";
 
+
 export default function Home({ results, loading, hasSearched }) {
   return (
     <>

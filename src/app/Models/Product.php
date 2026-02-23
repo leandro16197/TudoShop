@@ -40,4 +40,8 @@ class Product extends Model
         );
     }
     
+    public function marcas()
+    {
+        return $this->belongsToMany(Marca::class, 'marca_producto', 'producto_id', 'marca_id');
+    }
 }

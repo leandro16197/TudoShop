@@ -1,32 +1,57 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import ProductCard from "./ProductCard";
+import FeaturedProductCard from "./ProductCardCarrousel";
 
 export default function FeaturedProductsCarousel() {
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const scrollRef = useRef(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("/frontend/v1/destacados")
+    setLoading(true); 
+    fetch("api/frontend/v1/destacados")
       .then(res => res.json())
-      .then(data => setProducts(data))
-      .catch(() => setProducts([]));
+      .then(data => {
+        setProducts(data);
+        setLoading(false); 
+      })
+      .catch(() => {
+        setProducts([]);
+        setLoading(false);
+      });
   }, []);
 
   const handleScroll = (direction) => {
     const container = scrollRef.current;
     if (!container) return;
-    
+    const scrollAmount = container.clientWidth * 0.8;
 
-    const scrollAmount = container.clientWidth * 0.8; 
-    container.scrollBy({
-      left: direction === "left" ? -scrollAmount : scrollAmount,
-      behavior: "smooth"
-    });
+    if (direction === "right") {
+      if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 1) {
+        container.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        container.scrollBy({ left: scrollAmount, behavior: "smooth" });
+      }
+    } else {
+      if (container.scrollLeft <= 0) {
+        container.scrollTo({ left: container.scrollWidth, behavior: "smooth" });
+      } else {
+        container.scrollBy({ left: -scrollAmount, behavior: "smooth" });
+      }
+    }
   };
 
-  if (!products.length) return null;
+  if (loading) {
+    return (
+      <div className="loading-container-mini">
+        <div className="spinner"></div>
+        <p>Cargando productos destacados...</p>
+      </div>
+    );
+  }
+
+  if (products.length === 0) return null;
 
   return (
     <div className="featured-section">
@@ -43,7 +68,7 @@ export default function FeaturedProductsCarousel() {
         <div className="carousel" ref={scrollRef}>
           {products.map(product => (
             <div key={product.id} className="carousel-item">
-              <ProductCard product={product} isCarousel={true} />
+              <FeaturedProductCard product={product} />
             </div>
           ))}
         </div>

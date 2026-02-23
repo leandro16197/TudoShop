@@ -2,19 +2,20 @@
 
 namespace App\Http\Controllers\Fe;
 
+
 use App\Http\Controllers\Controller;
-use App\Models\Categoria;
+use App\Models\Marca;
 use Illuminate\Http\Request;
 
-class FeCategoriasController extends Controller
+class FeMarcasController extends Controller
 {
     public function index()
     {
-        $categorias = Categoria::select('id', 'nombre', 'imagen')
+        $marcas = Marca::select('id', 'nombre')
             ->orderBy('nombre')
             ->get();
 
-        return response()->json($categorias);
+        return response()->json($marcas);
     }
     
 }

@@ -4,33 +4,16 @@ use App\Http\Controllers\Admin\ProductosController as AdminProductosController;
 use App\Http\Controllers\Admin\CategoriasController ;
 use App\Http\Controllers\Admin\MarcaController;
 use App\Http\Controllers\Admin\OfertaController ;
-use App\Http\Controllers\Fe\ProductosController as FeProductosController;
-use App\Http\Controllers\Fe\FeCategoriasController as FeCategoriasController;
+use App\Http\Controllers\Admin\ClienteController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Frontend clientes (React) - v1
-|--------------------------------------------------------------------------
-*/
 Route::prefix('home')->group(function () {
     Route::get('/', function () {
         return view('frontend.home');
     });
 });
-Route::prefix('frontend/v1')->group(function () {
-    Route::get('productos', [FeProductosController::class, 'search']);
-    Route::get('productos/{id}', [FeProductosController::class, 'detail']);
-    Route::get('categorias', [FeCategoriasController::class, 'index']);
-    Route::get('destacados', [FeProductosController::class, 'featured']);
-});
 
-/*
-|--------------------------------------------------------------------------
-| Panel administrativo - v2
-|--------------------------------------------------------------------------
-*/
 Route::get('/panel', function () {
             return view('admin.dashboard');
         })->name('dashboard');
@@ -38,6 +21,7 @@ Route::get('products', [AdminProductosController::class, 'index'])->name('admin.
 Route::get('categorias', [CategoriasController::class, 'index'])->name('admin.categorias');
 Route::get('ofertas', [OfertaController::class, 'index'])->name('admin.ofertas');
 Route::get('marcas', [MarcaController::class,'index'])->name('admin.marcas');
+Route::get('clientes', [ClienteController::class, 'index'])->name('admin.clientes');
 
 Route::middleware(['auth', 'verified'])
     ->prefix('frontend/v2')
@@ -58,7 +42,12 @@ Route::middleware(['auth', 'verified'])
         Route::post('marcas/{id}', [MarcaController::class, 'update']);
         Route::delete('marcas/{id}', [MarcaController::class, 'destroy']);
         Route::post('marcas', [MarcaController::class, 'store'])->name('admin.marcas.store');
+        Route::get('clientes', [ClienteController::class, 'index'])->name('clientes');
+        Route::post('clientes/store', [ClienteController::class, 'store'])->name('clientes.store');
+        Route::post('clientes/{id}', [ClienteController::class, 'update'])->name('clientes.update');
+        Route::delete('clientes/{id}', [ClienteController::class, 'destroy'])->name('clientes.destroy');
 
 });
-
+Route::view('/{any}', 'frontend.home')
+    ->where('any', '^(?!panel|frontend|api).*$');
 require __DIR__.'/auth.php';
