@@ -189,6 +189,7 @@ class ProductosController extends Controller
                 'descripcion' => $producto->description,
                 'precio' => (float) $producto->price,
                 'activo' => (bool) $producto->active,
+                'stock' =>$producto->stock,
                 'imagen' => $imagen,
             ];
         });

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react"; // 1. Agregamos useRef aquí
+import React, { useEffect, useState, useRef } from "react";
 import Sidebar from "../components/Sidebar";
 import ProductList from "../components/ProductList";
 

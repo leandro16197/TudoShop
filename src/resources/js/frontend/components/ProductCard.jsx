@@ -1,7 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useCart } from '../context/CartContext';
+import 'bootstrap-icons/font/bootstrap-icons.css';
 
 export default function ProductCard({ product, loading, isCarousel = false }) {
+
+  const { addToCart } = useCart();
+  const [quantity, setQuantity] = useState(1);
 
   if (loading) {
     return (
@@ -34,6 +39,26 @@ export default function ProductCard({ product, loading, isCarousel = false }) {
     currency: "ARS",
   }).format(product.precio);
 
+  const stock = product.stock ?? 0;
+
+  const handleQuantityChange = (value) => {
+    let newValue = parseInt(value) || 1;
+
+    if (newValue < 1) newValue = 1;
+    if (newValue > stock) newValue = stock;
+
+    setQuantity(newValue);
+  };
+
+  const handleAddToCart = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (stock === 0) return;
+
+    addToCart(product, quantity);
+  };
+
   return (
     <div className={cardClass}>
       <Link to={`/productos/${product.id}`} className="product-card-link">
@@ -60,18 +85,73 @@ export default function ProductCard({ product, loading, isCarousel = false }) {
           <div className="product-price-stock">
             <span className="price">{formattedPrice}</span>
 
-            <span
-              className={`stock-badge ${
-                product.activo ? "available" : "out"
-              }`}
-            >
-              {product.activo ? "Disponible" : "Agotado"}
-            </span>
+            <p className={`stock-dinamico 
+              ${product.stock === 0 ? "sin-stock" : 
+                product.stock <= 10 ? "poco-stock" : "en-stock"}`}>
+              
+              {product.stock === 0 && "Agotado"}
+              {product.stock > 0 && product.stock <= 10 && `¡Últimas ${product.stock} unidades!`}
+              {product.stock > 10 && "Disponible en stock"}
+            </p>
           </div>
 
-          <button className="details-btn">
+
+          {stock > 0 && (
+            <div className="fila-carrito">
+              <div className="selector-cantidad">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (quantity > 1) setQuantity(quantity - 1);
+                  }}
+                >
+                  -
+                </button>
+
+                <input
+                  type="number"
+                  min="1"
+                  max={stock}
+                  value={quantity}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  onChange={(e) => handleQuantityChange(e.target.value)}
+                />
+
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (quantity < stock) setQuantity(quantity + 1);
+                  }}
+                >
+                  +
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleAddToCart}
+                className="btn-icono-carrito"
+              >
+                <i className="bi bi-cart-plus"></i>
+              </button>
+            </div>
+          )}
+
+          <button
+            type="button"
+            className="details-btn"
+            onClick={(e) => e.stopPropagation()}
+          >
             Ver detalles
           </button>
+
         </div>
 
       </Link>

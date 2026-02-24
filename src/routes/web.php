@@ -17,11 +17,11 @@ Route::prefix('home')->group(function () {
 Route::get('/panel', function () {
             return view('admin.dashboard');
         })->name('dashboard');
-Route::get('products', [AdminProductosController::class, 'index'])->name('admin.productos.productos');
-Route::get('categorias', [CategoriasController::class, 'index'])->name('admin.categorias');
-Route::get('ofertas', [OfertaController::class, 'index'])->name('admin.ofertas');
-Route::get('marcas', [MarcaController::class,'index'])->name('admin.marcas');
-Route::get('clientes', [ClienteController::class, 'index'])->name('admin.clientes');
+Route::get('/panel/products', [AdminProductosController::class, 'index'])->name('admin.productos.productos');
+Route::get('/panel/categorias', [CategoriasController::class, 'index'])->name('admin.categorias');
+Route::get('/panel/ofertas', [OfertaController::class, 'index'])->name('admin.ofertas');
+Route::get('/panel/marcas', [MarcaController::class,'index'])->name('admin.marcas');
+Route::get('/panel/clientes', [ClienteController::class, 'index'])->name('admin.clientes');
 
 Route::middleware(['auth', 'verified'])
     ->prefix('frontend/v2')

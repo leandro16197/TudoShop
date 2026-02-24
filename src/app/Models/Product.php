@@ -44,4 +44,14 @@ class Product extends Model
     {
         return $this->belongsToMany(Marca::class, 'marca_producto', 'producto_id', 'marca_id');
     }
+
+    public function pedidos()
+    {
+        return $this->belongsToMany(
+            Pedido::class, 
+            'pedidos_productos', 
+            'producto_id', 
+            'pedido_id'
+        )->withPivot('cantidad');
+    }
 }

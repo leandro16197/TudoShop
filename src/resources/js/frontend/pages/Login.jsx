@@ -32,8 +32,8 @@ export default function Login() {
     setError(null);
 
     try {
-      localStorage.removeItem("token");
-      localStorage.removeItem("cliente");
+      sessionStorage.removeItem("token");
+      sessionStorage.removeItem("cliente");
 
       const response = await fetch("api/frontend/v1/login", {
         method: "POST",
@@ -49,10 +49,9 @@ export default function Login() {
       if (!response.ok) {
         throw new Error(data.message || "Credenciales incorrectas");
       }
-
-      localStorage.setItem("token", data.token);
-
-      localStorage.setItem("cliente", JSON.stringify(data.cliente));
+      sessionStorage.setItem("token", data.token);
+      sessionStorage.setItem("cliente", JSON.stringify(data.cliente));
+      window.dispatchEvent(new Event("authChange"));
 
       navigate("/");
 
@@ -63,50 +62,50 @@ export default function Login() {
     }
   };
 
-return (
-  <div className="auth-page-wrapper">
-    <div className="login-card">
-      <div className="auth-header">
-        <h2>¡Hola de nuevo!</h2>
-        <p>Ingresa tus datos para continuar comprando</p>
+  return (
+    <div className="auth-page-wrapper">
+      <div className="login-card">
+        <div className="auth-header">
+          <h2>¡Hola de nuevo!</h2>
+          <p>Ingresa tus datos para continuar comprando</p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="auth-form">
+          <div className="input-group">
+            <label>Correo electrónico</label>
+            <input 
+              type="email" 
+              name="email" 
+              placeholder="ejemplo@correo.com"
+              value={form.email} 
+              onChange={handleChange} 
+              required 
+            />
+          </div>
+
+          <div className="input-group">
+            <label>Contraseña</label>
+            <input 
+              type="password" 
+              name="password" 
+              placeholder="••••••••"
+              value={form.password} 
+              onChange={handleChange} 
+              required 
+            />
+          </div>
+
+          {error && <div className="auth-error">{error}</div>}
+
+          <button type="submit" className="btn-auth" disabled={loading}>
+            {loading ? <span className="spinner-small"></span> : "Ingresar"}
+          </button>
+
+          <div className="auth-footer">
+            ¿No tienes una cuenta? <Link to="/registro">Regístrate gratis</Link>
+          </div>
+        </form>
       </div>
-
-      <form onSubmit={handleSubmit} className="auth-form">
-        <div className="input-group">
-          <label>Correo electrónico</label>
-          <input 
-            type="email" 
-            name="email" 
-            placeholder="ejemplo@correo.com"
-            value={form.email} 
-            onChange={handleChange} 
-            required 
-          />
-        </div>
-
-        <div className="input-group">
-          <label>Contraseña</label>
-          <input 
-            type="password" 
-            name="password" 
-            placeholder="••••••••"
-            value={form.password} 
-            onChange={handleChange} 
-            required 
-          />
-        </div>
-
-        {error && <div className="auth-error">{error}</div>}
-
-        <button type="submit" className="btn-auth" disabled={loading}>
-          {loading ? <span className="spinner-small"></span> : "Ingresar"}
-        </button>
-
-        <div className="auth-footer">
-          ¿No tienes una cuenta? <Link to="/registro">Regístrate gratis</Link>
-        </div>
-      </form>
     </div>
-  </div>
-);
+  );
 }
