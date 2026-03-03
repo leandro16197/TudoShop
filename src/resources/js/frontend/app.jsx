@@ -9,9 +9,19 @@ import Footer from "./components/Footer";
 import Login from "./pages/Login";
 import Register from "./pages/Registro";
 import Perfil from "./pages/Perfil";
+import PaginaCompra from "./pages/paginaCompra";
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
-
+import axios from 'axios';
+axios.defaults.baseURL = 'http://localhost:8000';
+axios.interceptors.request.use((config) => {
+    const token = localStorage.getItem('AUTH_TOKEN'); 
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    config.headers.Accept = 'application/json';
+    return config;
+});
 import "../../css/app.css";
 
 export default function App() {
@@ -31,6 +41,7 @@ export default function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/registro" element={<Register />} />
               <Route path="/perfil" element={<Perfil />} />
+              <Route path="/checkout" element={<PaginaCompra />} />
             </Routes>
           </main>
           

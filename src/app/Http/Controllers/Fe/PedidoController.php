@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Fe;
 
 use App\Http\Controllers\Controller;
+use App\Models\Configuracion;
 use App\Models\Pedido;
 use Illuminate\Http\Request;
 use App\Models\PedidoProducto;
@@ -12,7 +13,6 @@ class PedidoController extends Controller
 {
     public function agregarProducto(Request $request)
     {   
-        \Log::debug($request->all());
         $request->validate([
             'producto_id' => 'required|exists:productos,id',
             'cantidad' => 'required|integer|min:1'
@@ -63,13 +63,21 @@ class PedidoController extends Controller
             ->first();
 
         if (!$pedido) {
-            return response()->json(['productos' => []]);
+            return response()->json([
+                'productos' => [],
+                'subtotal' => 0,
+                'usuario' => ['email' => $user->email]
+            ]);
         }
 
-        $productosFormateados = $pedido->productos->map(function ($producto) {
+        $subtotal = 0;
+
+        $productosFormateados = $pedido->productos->map(function ($producto) use (&$subtotal) {
+            $cantidad = $producto->pivot ? $producto->pivot->cantidad : 0;
+            $precio = $producto->price;
+            $subtotal += ($precio * $cantidad);
 
             $primeraImagen = $producto->imagenes->first();
-
             $urlImagen = $primeraImagen 
                 ? asset('storage/' . $primeraImagen->imagen) 
                 : asset('images/placeholder.png');
@@ -77,15 +85,18 @@ class PedidoController extends Controller
             return [
                 'id'       => $producto->id,
                 'nombre'   => $producto->name,  
-                'precio'   => $producto->price, 
+                'precio'   => $precio, 
                 'imagen'   => $urlImagen, 
-                'cantidad' => $producto->pivot ? $producto->pivot->cantidad : 0,
+                'cantidad' => $cantidad,
+                'total_linea' => $precio * $cantidad
             ];
         });
 
         return response()->json([
+            'usuario'   => ['email' => $user->email, 'nombre' => $user->name],
             'productos' => $productosFormateados,
-            'pedido_id' => $pedido->id
+            'pedido_id' => $pedido->id,
+            'subtotal'  => round($subtotal, 2)
         ]);
     }
 
@@ -127,5 +138,51 @@ class PedidoController extends Controller
         $pedido->productos()->detach($productoId);
 
         return response()->json(['ok' => true]);
+    }
+    public function calcularEnvio(Request $request)
+    {
+        $request->validate([
+            'cp_cliente' => 'required|string',
+            'subtotal' => 'required|numeric'
+        ]);
+
+        $cpCliente = $request->input('cp_cliente');
+        $subtotal = $request->input('subtotal');
+        $configuracion = Configuracion::where('clave', 'codigo_postal')->first();
+        $cpTienda = $configuracion ? $configuracion->dato : '7000';
+        $costoEnvio = 0;
+
+    
+        if ($cpCliente === $cpTienda) {
+            $costoEnvio = 0;
+        } elseif (substr($cpCliente, 0, 2) === substr($cpTienda, 0, 2)) {
+            $costoEnvio = 1500;
+        } else {
+            $costoEnvio = 3000 + ($subtotal * 0.02);
+        }
+
+        return response()->json([
+            'envio' => $costoEnvio,
+            'total' => $subtotal + $costoEnvio,
+            'gratis' => ($costoEnvio == 0),
+            'cp_tienda_usado' => $cpTienda 
+        ]);
+    }
+
+    public function finalizarPedido(Request $request)
+    {
+        $request->validate([
+            'pedido_id' => 'required|exists:pedidos,id',
+            'datos_envio' => 'required|array',
+            'metodo_pago' => 'required'
+        ]);
+
+        $pedido = Pedido::find($request->pedido_id);
+
+        $pedido->detalle_envio = json_encode($request->datos_envio);
+        $pedido->estado = 'procesando';
+        $pedido->save();
+
+        return response()->json(['res' => true, 'mensaje' => '¡Pedido realizado con éxito!']);
     }
 }

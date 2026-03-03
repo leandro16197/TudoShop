@@ -21,6 +21,11 @@ Route::prefix('frontend/v1')->group(function () {
         Route::post('actualizar-cantidad', [PedidoController::class, 'actualizarCantidad']);
         Route::delete('/eliminar-producto/{productoId}', [PedidoController::class, 'eliminarProducto']);
         Route::post('/pedidos/agregar-producto', [PedidoController::class, 'agregarProducto']);
+        Route::post('/checkout/calcular-envio', [PedidoController::class, 'calcularEnvio']);
+        Route::post('/checkout/finalizar', [PedidoController::class, 'finalizarPedido']);
+        Route::get('/pedidos/mi-carrito', [PedidoController::class, 'obtenerCarrito']);
+        Route::post('/checkout/calcular-envio', [PedidoController::class, 'calcularEnvio']);
+        Route::post('/checkout/finalizar', [PedidoController::class, 'finalizarPedido']);
     });
     
     Route::get('productos', [FeProductosController::class, 'search']);
