@@ -2,9 +2,22 @@
 
 namespace App\Providers;
 
-use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\View;
+use App\Models\Configuracion;    
 
-class RouteServiceProvider extends ServiceProvider
+class AppServiceProvider extends ServiceProvider
 {
-    public const HOME = '/panel/dashboard';
+    public function boot(): void
+    {
+        View::composer('*', function ($view) {
+            $config = Configuracion::where('clave', 'logo_sitio')->first();
+            
+            $logoPath = ($config && $config->dato) 
+                        ? asset('storage/' . $config->dato) 
+                        : asset('images/logoShopTudo.png');
+
+            $view->with('logo_navbar', $logoPath);
+        });
+    }
 }

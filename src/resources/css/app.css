@@ -2789,8 +2789,8 @@ body {
 
 .cart-dropdown-menu {
     position: absolute;
-    top: calc(100% + 15px);
-    right: 0;
+    top: calc(60% + 15px);
+    right: 45px;
     width: 320px; 
     background: white;
     border-radius: 10px;
@@ -2930,4 +2930,59 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+
+.navbar-right {
+    display: flex;
+    align-items: center; 
+    gap: 20px;          
+}
+
+
+.btn-cart-trigger {
+    background: none;
+    border: none;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease; 
+    position: relative;     
+    display: flex;
+    justify-content: center;
+    padding: 8px;
+}
+
+
+.btn-cart-trigger i {
+    color: #f39c12;      
+    font-size: 1.6rem;  
+    transition: color 0.3s ease;
+}
+
+
+.btn-cart-trigger:hover {
+    transform: scale(1.15);
+}
+
+.btn-cart-trigger:hover i {
+    color: #e67e22;   
+}
+
+.cart-badge {
+    position: absolute;    
+    top: -5px;
+    right: -5px;
+    background-color: #ff4757;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    border-radius: 50%;
+    width: 18px;            
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #001f3f;
+    z-index: 10;
 }

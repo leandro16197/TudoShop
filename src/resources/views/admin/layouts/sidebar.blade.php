@@ -108,6 +108,32 @@
                     </ul>
                 </div>
             </li>
+            <li class="nav-item">
+                <a class="nav-link d-flex justify-content-between align-items-center {{ request()->routeIs('admin.configuracion.general') ? 'active' : '' }}"
+                data-bs-toggle="collapse"
+                href="#configSubmenu"
+                role="button"
+                aria-expanded="{{ request()->routeIs('admin.configuracion.general') ? 'true' : 'false' }}"
+                aria-controls="configSubmenu">
+                    <span>
+                        <i class="bi bi-gear me-2"></i> Configuración
+                    </span>
+                    <i class="bi bi-chevron-down toggle-icon"></i>
+                </a>
+
+                <div class="collapse {{ request()->routeIs('admin.configuracion.general') ? 'show' : '' }}"
+                    id="configSubmenu"
+                    style="margin-left:20px; margin-top:5px;">
+                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                        <li>
+                            <a href="{{ route('admin.configuracion.general') }}"
+                            class="nav-link ps-4 {{ request()->routeIs('admin.configuracion.general') ? 'active' : '' }}">
+                                <i class="bi bi-sliders me-2"></i> General
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
         </ul>
 
     </ul>

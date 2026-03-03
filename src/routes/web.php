@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CategoriasController ;
 use App\Http\Controllers\Admin\MarcaController;
 use App\Http\Controllers\Admin\OfertaController ;
 use App\Http\Controllers\Admin\ClienteController;
+use App\Http\Controllers\Admin\ConfiguracionController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,11 +18,13 @@ Route::prefix('home')->group(function () {
 Route::get('/panel', function () {
             return view('admin.dashboard');
         })->name('dashboard');
+
 Route::get('/panel/products', [AdminProductosController::class, 'index'])->name('admin.productos.productos');
 Route::get('/panel/categorias', [CategoriasController::class, 'index'])->name('admin.categorias');
 Route::get('/panel/ofertas', [OfertaController::class, 'index'])->name('admin.ofertas');
 Route::get('/panel/marcas', [MarcaController::class,'index'])->name('admin.marcas');
 Route::get('/panel/clientes', [ClienteController::class, 'index'])->name('admin.clientes');
+Route::get('/panel/configuracion', [ConfiguracionController::class, 'index'])->name('admin.configuracion.general');
 
 Route::middleware(['auth', 'verified'])
     ->prefix('frontend/v2')
@@ -46,6 +49,7 @@ Route::middleware(['auth', 'verified'])
         Route::post('clientes/store', [ClienteController::class, 'store'])->name('clientes.store');
         Route::post('clientes/{id}', [ClienteController::class, 'update'])->name('clientes.update');
         Route::delete('clientes/{id}', [ClienteController::class, 'destroy'])->name('clientes.destroy');
+        Route::post('configuracion/update', [ConfiguracionController::class, 'update'])->name('admin.configuracion.update');
 
 });
 Route::view('/{any}', 'frontend.home')

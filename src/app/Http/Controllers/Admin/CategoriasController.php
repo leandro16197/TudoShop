@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Storage;
 
 class CategoriasController extends Controller
 {   
-     protected $viewPath = 'admin.productos.categorias';
+    protected $viewPath = 'admin.productos.categorias';
 
     public function index(Request $request)
     {

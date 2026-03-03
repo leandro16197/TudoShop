@@ -4,12 +4,12 @@
     <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item d-flex align-items-center">
             <a class="nav-link active" href="{{ route('dashboard') }}">
-                <img src="{{ asset('images/logoShopTudo.png') }}" 
+                <img src="{{ $logo_navbar }}" 
                     alt="ShopTudo Logo" 
                     class="navbar-logo">
             </a>
         </li>
-    </ul>
+    </ul> 
 
 
     <span class="navbar-brand position-absolute top-50 start-50 translate-middle text-white fw-bold">
