@@ -44,7 +44,6 @@ const FormularioEntrega = ({ onCalcularEnvio, subtotal }) => {
                 </div>
             </div>
 
-            {/* FORMULARIO DE DIRECCIÓN */}
             <div className="row g-3">
                 <div className="col-md-4">
                     <input type="text" className="form-control" placeholder="CP *" 

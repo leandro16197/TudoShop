@@ -5,6 +5,7 @@ use App\Http\Controllers\Fe\FeCategoriasController as FeCategoriasController;
 use App\Http\Controllers\Fe\FeMarcasController as FeMarcasController;
 use App\Http\Controllers\Fe\FeClientesController;
 use App\Http\Controllers\Fe\AuthClienteController;
+use App\Http\Controllers\FE\EnvioController;
 use App\Http\Controllers\Fe\PedidoController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,11 +22,10 @@ Route::prefix('frontend/v1')->group(function () {
         Route::post('actualizar-cantidad', [PedidoController::class, 'actualizarCantidad']);
         Route::delete('/eliminar-producto/{productoId}', [PedidoController::class, 'eliminarProducto']);
         Route::post('/pedidos/agregar-producto', [PedidoController::class, 'agregarProducto']);
-        Route::post('/checkout/calcular-envio', [PedidoController::class, 'calcularEnvio']);
         Route::post('/checkout/finalizar', [PedidoController::class, 'finalizarPedido']);
-        Route::get('/pedidos/mi-carrito', [PedidoController::class, 'obtenerCarrito']);
         Route::post('/checkout/calcular-envio', [PedidoController::class, 'calcularEnvio']);
-        Route::post('/checkout/finalizar', [PedidoController::class, 'finalizarPedido']);
+        Route::put('perfil/actualizar/email', [FeClientesController::class, 'actualizarEmail']);
+        Route::post('pedidos/guardar-envio', [EnvioController::class, 'guardarEnvio']);
     });
     
     Route::get('productos', [FeProductosController::class, 'search']);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Fe;
 
 use App\Http\Controllers\Controller;
 use App\Models\Cliente;
+use App\Models\Pedido;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -45,6 +46,27 @@ class FeClientesController extends Controller
         return response()->json([
             'message' => 'Perfil actualizado correctamente',
             'user'    => $cliente
+        ]);
+    }
+    public function actualizarEmail(Request $request)
+    {
+
+        $validated = $request->validate([
+            'pedido_id' => 'required|exists:pedidos,id',
+            'email'     => 'required|email',
+        ]);
+
+        $pedido = Pedido::findOrFail($request->pedido_id);
+
+        $pedido->update([
+            'email' => $request->email, 
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'usuario' => [
+                'email' => $pedido->email
+            ]
         ]);
     }
     

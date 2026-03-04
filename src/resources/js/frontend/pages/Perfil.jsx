@@ -12,7 +12,6 @@ export default function Perfil() {
 
     useEffect(() => {
         const fetchUserData = async () => {
-            // CAMBIO: Ahora buscamos en sessionStorage
             const token = sessionStorage.getItem("token");
             
             if (!token) {
@@ -59,7 +58,6 @@ export default function Perfil() {
             return;
         }
 
-        // CAMBIO: Ahora buscamos en sessionStorage
         const token = sessionStorage.getItem("token");
         
         try {
@@ -74,11 +72,10 @@ export default function Perfil() {
             });
 
             if (response.ok) {
-                // CAMBIO: Actualizamos el objeto 'cliente' en sessionStorage
                 const clienteStorage = JSON.parse(sessionStorage.getItem("cliente"));
                 sessionStorage.setItem("cliente", JSON.stringify({ ...clienteStorage, nombre: user.nombre }));
                 
-                // Avisamos al resto de la app (Navbar, etc) que el nombre cambió
+
                 window.dispatchEvent(new Event("authChange"));
                 
                 alert("Perfil actualizado correctamente");

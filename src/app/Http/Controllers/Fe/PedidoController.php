@@ -55,23 +55,27 @@ class PedidoController extends Controller
 
     public function obtenerCarrito()
     {
-        $user = Auth::user();
+        $user = \Auth::user();
+
 
         $pedido = Pedido::where('user_id', $user->id)
             ->where('estado', 'pendiente')
-            ->with('productos.imagenes') 
+            ->with(['productos.imagenes', 'envio']) 
             ->first();
 
         if (!$pedido) {
             return response()->json([
                 'productos' => [],
                 'subtotal' => 0,
+                'costo_envio' => 0,
+                'total' => 0,
                 'usuario' => ['email' => $user->email]
             ]);
         }
 
         $subtotal = 0;
 
+    
         $productosFormateados = $pedido->productos->map(function ($producto) use (&$subtotal) {
             $cantidad = $producto->pivot ? $producto->pivot->cantidad : 0;
             $precio = $producto->price;
@@ -83,20 +87,43 @@ class PedidoController extends Controller
                 : asset('images/placeholder.png');
 
             return [
-                'id'       => $producto->id,
-                'nombre'   => $producto->name,  
-                'precio'   => $precio, 
-                'imagen'   => $urlImagen, 
-                'cantidad' => $cantidad,
+                'id'          => $producto->id,
+                'nombre'      => $producto->name,  
+                'precio'      => $precio, 
+                'imagen'      => $urlImagen, 
+                'cantidad'    => $cantidad,
                 'total_linea' => $precio * $cantidad
             ];
         });
 
+
+        $costoEnvio = 0;
+        $datosEnvioGuardados = $pedido->envio;
+
+        if ($datosEnvioGuardados) {
+        
+            $config = \DB::table('configuracions')->select('dato')->where('clave', 'codigo_postal')->first();
+            $cpTienda = $config ? $config->dato : null;
+
+            if ($cpTienda && $datosEnvioGuardados->cp !== $cpTienda) {
+
+                $costoEnvio = 1000 + ($subtotal * 0.10);
+            } else {
+                $costoEnvio = 1000;
+            }
+        }
+
         return response()->json([
-            'usuario'   => ['email' => $user->email, 'nombre' => $user->name],
-            'productos' => $productosFormateados,
-            'pedido_id' => $pedido->id,
-            'subtotal'  => round($subtotal, 2)
+            'usuario'     => [
+                'email'  => $user->email, 
+                'nombre' => $user->name
+            ],
+            'productos'   => $productosFormateados,
+            'pedido_id'   => $pedido->id,
+            'subtotal'    => round($subtotal, 2),
+            'costo_envio' => round($costoEnvio, 2),
+            'total'       => round($subtotal + $costoEnvio, 2),
+            'datos_envio' => $datosEnvioGuardados 
         ]);
     }
 

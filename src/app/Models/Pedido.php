@@ -28,5 +28,9 @@ class Pedido extends Model
     {
         return $this->belongsTo(User::class);
     }
-    
+
+    public function envio()
+    {
+        return $this->hasOne(EnvioPedido::class, 'pedido_id');
+    }
 }

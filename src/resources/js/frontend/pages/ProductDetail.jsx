@@ -50,17 +50,13 @@ export default function ProductDetail() {
             .catch(err => console.error(err));
     }, [id]);
 
-    // Función de agregar al carrito corregida
     const handleAddToCart = async () => {
         try {
-            // Usamos la función del contexto que ya maneja Token, Headers y Actualización del Navbar
             await addToCart(product, quantity);
             
-            // Opcional: podrías mostrar un toast o alert de éxito
             console.log("Producto agregado y carrito actualizado");
         } catch (error) {
-            // Si el error es por falta de auth, el contexto suele redirigir, 
-            // pero lo manejamos por si acaso:
+
             if (error.message.includes("sesión")) {
                 navigate("/login");
             }
