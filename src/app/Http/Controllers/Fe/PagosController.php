@@ -54,10 +54,10 @@ class PagosController extends Controller
 
         if ($pedido->envio) {
             $cpTienda = $configs['codigo_postal'] ?? '7000';
-            $costoCalculado = ($pedido->envio->cp !== $cpTienda) 
-                ? 1000 + ($subtotal * 0.10) 
+            $costoCalculado = ($pedido->envio->cp !== $cpTienda)
+                ? 1000 + ($subtotal * 0.10)
                 : 1000;
-            
+
             $items[] = [
                 "title" => "Costo de Envío",
                 "quantity" => 1,
@@ -74,7 +74,7 @@ class PagosController extends Controller
             $preference_data = [
                 "items" => $items,
                 "back_urls" => [
-                    "success" => url('/checkout/success'), 
+                    "success" => url('/checkout/success'),
                     "failure" => url('/checkout/error'),
                     "pending" => url('/checkout/error')
                 ],
@@ -83,14 +83,13 @@ class PagosController extends Controller
                 "binary_mode" => true,
                 "statement_descriptor" => "SHOPTUDO",
             ];
-            
+
             $preference = $client->create($preference_data);
 
             return response()->json([
                 "status" => "success",
                 "init_point" => $preference->init_point
             ]);
-
         } catch (\MercadoPago\Exceptions\MPApiException $e) {
             $response = $e->getApiResponse();
             $content = $response ? $response->getContent() : [];
@@ -99,7 +98,7 @@ class PagosController extends Controller
             if (str_contains($message, 'auto_return')) {
                 unset($preference_data['auto_return']);
                 $preference = $client->create($preference_data);
-                
+
                 return response()->json([
                     "status" => "success",
                     "init_point" => $preference->init_point,
@@ -115,7 +114,6 @@ class PagosController extends Controller
                     'total' => $subtotal
                 ]
             ], 400);
-
         } catch (\Exception $e) {
             return response()->json([
                 'error_message' => 'Error general',
@@ -125,10 +123,10 @@ class PagosController extends Controller
     }
     public function webhook(Request $request)
     {
-     
+
 
         $token = DB::table('configuracions')->where('clave', 'mp_access_token')->value('dato');
-        
+
         if (!$token) {
 
             return response()->json(['error' => 'Configuración no encontrada'], 500);
@@ -138,18 +136,14 @@ class PagosController extends Controller
 
         $type = $request->input('type') ?? $request->input('topic');
         $paymentId = $request->input('data.id') ?? $request->input('id');
-        
-        if ($paymentId == "123456") {
-            return response()->json(['status' => 'simulacion_ok'], 200);
-        }
 
         if ($type === 'payment' && $paymentId) {
             try {
                 $client = new PaymentClient();
                 $payment = $client->get($paymentId);
                 $pedidoId = $payment->external_reference;
-                
-         
+
+
 
                 if ($payment->status === 'approved' && $pedidoId) {
                     $actualizado = DB::table('pedidos')
@@ -159,10 +153,6 @@ class PagosController extends Controller
                             'updated_at' => now()
                         ]);
 
-                    if ($actualizado) {
-
-                    }
-                    
                     return response()->json(['status' => 'success'], 200);
                 }
             } catch (\Exception $e) {
@@ -173,45 +163,44 @@ class PagosController extends Controller
         return response()->json(['status' => 'received'], 200);
     }
 
-        public function confirmarPagoManual(Request $request)
-        {
-            if ($request->status === 'approved') {
-                try {
-                    DB::transaction(function () use ($request) {
+    public function confirmarPagoManual(Request $request)
+    {
+        if ($request->status === 'approved') {
+            try {
+                DB::transaction(function () use ($request) {
 
-                        $pedido = Pedido::with('productos')
-                            ->where('id', $request->pedido_id)
-                            ->where('estado', 'pendiente')
-                            ->first();
+                    $pedido = Pedido::with('productos')
+                        ->where('id', $request->pedido_id)
+                        ->where('estado', 'pendiente')
+                        ->first();
 
-                        if ($pedido) {
-                            foreach ($pedido->productos as $producto) {
-                                $cantidadComprada = $producto->pivot->cantidad;
+                    if ($pedido) {
+                        foreach ($pedido->productos as $producto) {
+                            $cantidadComprada = $producto->pivot->cantidad;
 
-                                DB::table('productos')
-                                    ->where('id', $producto->id)
-                                    ->decrement('stock', $cantidadComprada);
-                            }
-                            DB::table('pedidos')
-                                ->where('id', $request->pedido_id)
-                                ->update([
-                                    'estado' => 'pagado',
-                                    'payment_id' => $request->payment_id,
-                                    'updated_at' => now()
-                                ]);
+                            DB::table('productos')
+                                ->where('id', $producto->id)
+                                ->decrement('stock', $cantidadComprada);
                         }
-                    });
+                        DB::table('pedidos')
+                            ->where('id', $request->pedido_id)
+                            ->update([
+                                'estado' => 'pagado',
+                                'payment_id' => $request->payment_id,
+                                'updated_at' => now()
+                            ]);
+                    }
+                });
 
-                    return response()->json(['message' => 'Pago confirmado y stock descontado con éxito']);
-
-                } catch (\Exception $e) {
-                    return response()->json([
-                        'message' => 'Error al procesar el stock',
-                        'error' => $e->getMessage()
-                    ], 500);
-                }
+                return response()->json(['message' => 'Pago confirmado y stock descontado con éxito']);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'message' => 'Error al procesar el stock',
+                    'error' => $e->getMessage()
+                ], 500);
             }
-
-            return response()->json(['message' => 'El pago no está aprobado'], 400);
         }
+
+        return response()->json(['message' => 'El pago no está aprobado'], 400);
+    }
 }
