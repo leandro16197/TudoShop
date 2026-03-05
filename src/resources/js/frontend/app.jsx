@@ -1,4 +1,4 @@
-import React from "react"; // Ya no necesitas useState aquí si no lo usas
+import React from "react"; 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Navbar from "./components/Navbar";
@@ -10,10 +10,12 @@ import Login from "./pages/Login";
 import Register from "./pages/Registro";
 import Perfil from "./pages/Perfil";
 import PaginaCompra from "./pages/paginaCompra";
+import SuccessPage from './pages/SuccessPage';
+import ErrorPage from './pages/ErrorPage';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import axios from 'axios';
-axios.defaults.baseURL = 'http://localhost:8000';
+axios.defaults.baseURL = window.location.origin;
 axios.interceptors.request.use((config) => {
     const token = localStorage.getItem('AUTH_TOKEN'); 
     if (token) {
@@ -42,6 +44,8 @@ export default function App() {
               <Route path="/registro" element={<Register />} />
               <Route path="/perfil" element={<Perfil />} />
               <Route path="/checkout" element={<PaginaCompra />} />
+              <Route path="/checkout/success" element={<SuccessPage />} />
+              <Route path="/checkout/error" element={<ErrorPage />} />
             </Routes>
           </main>
           

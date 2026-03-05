@@ -33,6 +33,7 @@ class ProductosController extends Controller
                     'descripcion' => $producto->description,
                     'precio' => (float) $producto->price,
                     'activo' => (bool) $producto->active,
+                    'stock' => $producto->stock,
                     'imagen' => $imagen,
                 ];
             });
@@ -81,6 +82,7 @@ class ProductosController extends Controller
                     'id' => $producto->id,
                     'nombre' => $producto->name,
                     'precio' => (float) $producto->price,
+                    'stock' => $producto->stock,
                     'imagen' => $imagen,
                 ];
             });

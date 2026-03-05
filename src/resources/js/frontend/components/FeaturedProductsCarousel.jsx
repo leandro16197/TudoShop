@@ -42,15 +42,6 @@ export default function FeaturedProductsCarousel() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="loading-container-mini">
-        <div className="spinner"></div>
-        <p>Cargando productos destacados...</p>
-      </div>
-    );
-  }
-
   if (products.length === 0) return null;
 
   return (

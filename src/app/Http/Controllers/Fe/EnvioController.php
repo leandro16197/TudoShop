@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\FE;
+namespace App\Http\Controllers\Fe;
 
 use App\Http\Controllers\Controller;
 use App\Models\EnvioPedido;

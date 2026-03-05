@@ -3402,3 +3402,287 @@ body {
 .btn-editar-contacto:active {
     transform: scale(0.95); 
 }
+
+.success-container{
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:70vh;
+    padding:40px;
+
+}
+
+.success-card{
+
+    width:420px;
+    background:white;
+    border-radius:14px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.08);
+    overflow:hidden;
+
+}
+
+
+.success-header{
+
+    background:#22c55e;
+    padding:30px;
+    text-align:center;
+    color:white;
+
+}
+
+.success-header h2{
+
+    margin:10px 0 4px;
+    font-size:22px;
+
+}
+
+.success-header p{
+
+    font-size:14px;
+    opacity:.9;
+
+}
+
+.success-icon{
+
+    width:55px;
+    height:55px;
+    background:white;
+    border-radius:50%;
+    margin:auto;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+}
+
+.success-icon svg{
+
+    width:26px;
+    height:26px;
+    color:#22c55e;
+
+}
+
+
+.success-body{
+
+    padding:25px;
+
+}
+
+.success-info{
+
+    background:#f7f7f7;
+    padding:15px;
+    border-radius:8px;
+    margin-bottom:20px;
+
+}
+
+.success-info h4{
+
+    font-size:12px;
+    text-transform:uppercase;
+    color:#888;
+    margin-bottom:10px;
+
+}
+
+.info-row{
+
+    display:flex;
+    justify-content:space-between;
+    padding:6px 0;
+    font-size:14px;
+
+}
+
+.status{
+
+    background:#dcfce7;
+    color:#16a34a;
+    padding:4px 10px;
+    border-radius:12px;
+    font-size:12px;
+
+}
+
+
+.success-buttons{
+
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+
+}
+
+.btn-primary{
+
+    background:#111827;
+    color:white;
+    text-align:center;
+    padding:12px;
+    border-radius:8px;
+    text-decoration:none;
+    font-weight:600;
+
+}
+
+.btn-primary:hover{
+
+    background:black;
+
+}
+
+.btn-secondary{
+
+    text-align:center;
+    color:#f97316;
+    text-decoration:none;
+    font-weight:600;
+
+}
+
+.btn-secondary:hover{
+
+    text-decoration:underline;
+
+}
+
+
+.loader{
+
+    width:40px;
+    height:40px;
+    border:4px solid rgba(255,255,255,0.3);
+    border-top:4px solid white;
+    border-radius:50%;
+    margin:auto;
+    animation:spin 1s linear infinite;
+
+}
+
+@keyframes spin{
+
+    100%{
+        transform:rotate(360deg);
+    }
+
+}
+
+.featured-card {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid #f0f0f0;
+  height: 100%;
+  max-width: 280px; /* Tamaño ideal para el grid */
+  margin: 0 auto;
+}
+
+.featured-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+  border-color: #F97316; /* Tu naranja de marca */
+}
+
+/* Imagen centrada y escalada */
+.featured-card__image-wrapper {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background-color: #f9f9f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow: hidden;
+}
+
+.featured-card__image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* Para que la mochila no se corte */
+  transition: transform 0.5s ease;
+}
+
+.featured-card:hover .featured-card__image {
+  transform: scale(1.1);
+}
+
+/* Contenido con jerarquía */
+.featured-card__content {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  text-align: center; /* Centrado de textos */
+}
+
+.featured-card__title {
+  margin: 0 0 12px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937; /* Gris oscuro elegante */
+  line-height: 1.4;
+  height: 2.8em; /* Reserva espacio para 2 líneas */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Grupo de Precio y Stock alineado */
+.featured-card__info-group {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+
+.featured-card__price {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #111827;
+}
+
+.featured-card__stock {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+}
+
+.featured-card__stock.is-available {
+  color: #059669; /* Verde éxito */
+  background-color: #ecfdf5;
+}
+
+.featured-card__stock.is-out {
+  color: #dc2626; /* Rojo error */
+  background-color: #fef2f2;
+}
+
+/* Badge de últimas unidades */
+.featured-card__badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #F97316;
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}

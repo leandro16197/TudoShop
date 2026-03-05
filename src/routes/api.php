@@ -7,6 +7,7 @@ use App\Http\Controllers\Fe\FeClientesController;
 use App\Http\Controllers\Fe\AuthClienteController;
 use App\Http\Controllers\FE\EnvioController;
 use App\Http\Controllers\Fe\PedidoController;
+use App\Http\Controllers\Fe\PagosController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('frontend/v1')->group(function () {
@@ -26,6 +27,7 @@ Route::prefix('frontend/v1')->group(function () {
         Route::post('/checkout/calcular-envio', [PedidoController::class, 'calcularEnvio']);
         Route::put('perfil/actualizar/email', [FeClientesController::class, 'actualizarEmail']);
         Route::post('pedidos/guardar-envio', [EnvioController::class, 'guardarEnvio']);
+        Route::post('pago', [PagosController::class, 'pagar']);
     });
     
     Route::get('productos', [FeProductosController::class, 'search']);
@@ -35,4 +37,6 @@ Route::prefix('frontend/v1')->group(function () {
     Route::get('productos/categoria/{categoriaId}', [FeProductosController::class, 'byCategory']);
     Route::get('catalogo', [FeProductosController::class, 'catalogo']);
     Route::get('marcas', [FeMarcasController::class, 'index']);
+    Route::post('/mp/webhook', [PagosController::class, 'webhook']);
+    Route::post('/pedidos/confirmar-pago', [PagosController::class, 'confirmarPagoManual']);
 });

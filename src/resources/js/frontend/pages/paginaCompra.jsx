@@ -161,7 +161,25 @@ const PaginaCompra = () => {
             console.error("Error al guardar envío", error);
         }
     };
+    
+    const handlePago = async () => {
+        const token = sessionStorage.getItem("token");
+        if (!token || !pedidoId) return;
 
+        try {
+            const res = await axios.post('/api/frontend/v1/pago', 
+                { id_pedido: pedidoId }, 
+                { headers: { 'Authorization': `Bearer ${token}` } }
+            );
+
+            if (res.data.status === 'success' && res.data.init_point) {
+                window.location.href = res.data.init_point;
+            }
+        } catch (error) {
+            console.error("Error en la pasarela de pago:", error);
+            
+        }
+    };
     if (cargando) {
         return (
             <div className="loading-container">
@@ -402,9 +420,7 @@ const PaginaCompra = () => {
                                     cursor: (!datosEnvio.cp || !datosEnvio.direccion) ? 'not-allowed' : 'pointer',
                                     boxShadow: (!datosEnvio.cp || !datosEnvio.direccion) ? 'none' : '0 4px 15px rgba(255, 140, 0, 0.3)'
                                 }}
-                                onClick={() => {
-                                    console.log("Redirigiendo a pago...");
-                                }}
+                               onClick={handlePago}
                             >
                                 {(!datosEnvio.cp || !datosEnvio.direccion) ? 'Faltan datos de envío' : 'IR AL PAGO'}
                             </button>

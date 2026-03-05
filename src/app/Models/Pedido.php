@@ -33,4 +33,5 @@ class Pedido extends Model
     {
         return $this->hasOne(EnvioPedido::class, 'pedido_id');
     }
+    
 }

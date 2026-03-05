@@ -33,7 +33,7 @@ export default function CategoriesSection() {
             <div key={cat.id} className="category-card">
               <div className="category-image-wrapper">
                 <img 
-                  src={`http://localhost:8000/storage/${cat.imagen}`} 
+                  src={cat.imagen} 
                   alt={cat.nombre} 
                 />
                 <div className="category-overlay"></div>

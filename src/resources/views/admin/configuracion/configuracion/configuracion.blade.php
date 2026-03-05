@@ -86,6 +86,40 @@
                     </div>
                 </div>
             </div>
+            <div class="col-md-12">
+                <div class="admin-card shadow-sm">
+                    <div class="card-header border-0 py-4 px-4 d-flex align-items-center" style="background: linear-gradient(45deg, #009ee3, #007eb5);">
+                        <div class="header-icon-container bg-white me-3">
+                            <i class="bi bi-credit-card-2-back header-icon" style="color: #009ee3;"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-1 text-white fw-bold">Mercado Pago</h5>
+                            <span class="text-white-50 fs-7">Configuración de la pasarela de pagos</span>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col-md-8 mb-4">
+                                <label class="form-label text-muted fw-bold">Access Token de Producción</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-key text-primary"></i></span>
+                                    <input type="password" name="mp_access_token" class="form-control form-control-lg border-start-0 shadow-none" 
+                                        value="{{ $configs['mp_access_token'] ?? '' }}" placeholder="APP_USR-XXXXXXXXXXXX-XXXXXX-XXXXXXXXXXXX-XXXXXXXX">
+                                </div>
+                                <small class="text-muted d-block mt-1">Obtén tu token en el <a href="https://www.mercadopago.com.ar/developers/panel" target="_blank" class="text-decoration-none">Panel de Desarrolladores</a>.</small>
+                            </div>
+                            
+                            <div class="col-md-4 mb-4">
+                                <label class="form-label text-muted fw-bold">Entorno (Modo)</label>
+                                <select name="mp_mode" class="form-select form-select-lg shadow-none">
+                                    <option value="sandbox" {{ ($configs['mp_mode'] ?? '') == 'sandbox' ? 'selected' : '' }}>Pruebas (Sandbox)</option>
+                                    <option value="production" {{ ($configs['mp_mode'] ?? '') == 'production' ? 'selected' : '' }}>Producción (Ventas Reales)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="col-12 mt-5 mb-4 text-center">
                 <button type="submit" class="btn btn-primary btn-lg rounded-pill px-5 btn-animated-save" id="btnGuardar">
                     <i class="bi bi-check-circle me-1"></i>

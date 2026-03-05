@@ -12,7 +12,14 @@ class FeCategoriasController extends Controller
     {
         $categorias = Categoria::select('id', 'nombre', 'imagen')
             ->orderBy('nombre')
-            ->get();
+            ->get()
+            ->map(function ($categoria) {
+                return [
+                    'id' => $categoria->id,
+                    'nombre' => $categoria->nombre,
+                    'imagen' => $categoria->imagen ? asset('storage/' . $categoria->imagen) : null,
+                ];
+            });
 
         return response()->json($categorias);
     }
