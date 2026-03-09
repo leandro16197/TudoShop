@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-
+import { Link } from "react-router-dom";
 export default function CategoriesSection() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,17 +30,17 @@ export default function CategoriesSection() {
 
       <div className="categories-grid">
         {categories.map(cat => (
-            <div key={cat.id} className="category-card">
+            <Link 
+              key={cat.id} 
+              to={`/catalogo?categoria=${cat.id}`}
+              className="category-card"
+            >
               <div className="category-image-wrapper">
-                <img 
-                  src={cat.imagen} 
-                  alt={cat.nombre} 
-                />
+                <img src={cat.imagen} alt={cat.nombre} />
                 <div className="category-overlay"></div>
               </div>
-
               <h3 className="category-name">{cat.nombre}</h3>
-            </div>
+            </Link>
         ))}
       </div>
     </div>

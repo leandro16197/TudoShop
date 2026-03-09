@@ -8,6 +8,7 @@ const PaginaCompra = () => {
     const [usuario, setUsuario] = useState({ nombre: '', email: '' });
     const [montos, setMontos] = useState({subtotal: 0,costo_envio: 0,total: 0});
     const [editandoContacto, setEditandoContacto] = useState(false);
+    const [envioConfirmado, setEnvioConfirmado] = useState(false);
     const [pedidoId, setPedidoId] = useState(1);
     const [datosEnvio, setDatosEnvio] = useState({
         cp: '',
@@ -156,9 +157,11 @@ const PaginaCompra = () => {
 
             if (res.data.status === 'success') {
                 await fetchCart();
+                setEnvioConfirmado(true);
             }
         } catch (error) {
             console.error("Error al guardar envío", error);
+            setEnvioConfirmado(false); 
         }
     };
     
@@ -353,16 +356,7 @@ const PaginaCompra = () => {
                                 </div>
                                 <div className="col-12 mt-3 text-end">
                                     <button  onClick={guardarDatosEnvio}
-                                        style={{
-                                            backgroundColor: '#003366',
-                                            color: 'white',
-                                            border: 'none',
-                                            padding: '10px 25px',
-                                            borderRadius: '8px',
-                                            fontWeight: '600',
-                                            cursor: 'pointer',
-                                            fontSize: '14px'
-                                        }}
+                                        style={{backgroundColor: '#003366', color: 'white', border: 'none', padding: '10px 25px', borderRadius: '8px', fontWeight: '600', cursor: 'pointer', fontSize: '14px' }}
                                     >
                                         Confirmar datos de envío
                                     </button>
@@ -412,8 +406,7 @@ const PaginaCompra = () => {
 
                             <button 
                                 className="btn-checkout"
-                                disabled={ !datosEnvio.cp ||  !datosEnvio.direccion ||  !datosEnvio.localidad ||   !datosEnvio.nombre_destinatario || !pedidoId
-                                }
+                                disabled={!envioConfirmado}
                                 style={{ width: '100%', padding: '15px', borderRadius: '10px', border: 'none', fontWeight: 'bold', fontSize: '16px', textTransform: 'uppercase', transition: 'all 0.3s ease',
                                     backgroundColor: (!datosEnvio.cp || !datosEnvio.direccion) ? '#ced4da' : '#FF8C00',
                                     color: 'white',

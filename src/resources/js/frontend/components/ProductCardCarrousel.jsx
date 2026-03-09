@@ -23,20 +23,14 @@ export default function FeaturedProductCard({ product }) {
           <div className="featured-card__no-image">Sin imagen</div>
         )}
       </div>
-
       <div className="featured-card__content">
         <h4 className="featured-card__title">{nombre}</h4>
-
         <div className="featured-card__footer">
-          <span className="featured-card__price">{formattedPrice}</span>
-          <div className="featured-card__stock">
-            {stock > 0 ? (
-              <span className="featured-card__stock--available">
-                Stock: {stock}
-              </span>
-            ) : (
-              <span className="featured-card__stock--out">Agotado</span>
-            )}
+          <span className="featured-card__price featured-card__price--colored">
+            {formattedPrice}
+          </span>
+          <div className="featured-card__stock featured-card__stock--colored">
+            {stock > 0 ? `STOCK: ${stock}` : "AGOTADO"}
           </div>
         </div>
       </div>

@@ -9,7 +9,8 @@ use Illuminate\Notifications\Notifiable;
 class Cliente extends Authenticatable
 {
     use HasApiTokens, Notifiable;
-
+    
+    protected $table = 'clientes';
     protected $fillable = [
         'nombre',
         'apellido',
@@ -21,4 +22,7 @@ class Cliente extends Authenticatable
         'password',
         'remember_token',
     ];
+
+
+
 }

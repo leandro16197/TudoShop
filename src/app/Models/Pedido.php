@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Cliente;
 
 class Pedido extends Model
 {
+    
     protected $fillable = [
         'user_id',
         'email',
@@ -34,4 +36,13 @@ class Pedido extends Model
         return $this->hasOne(EnvioPedido::class, 'pedido_id');
     }
     
+
+    public function pago()
+    {
+        return $this->hasOne(Pagos::class, 'pedido_id');
+    }
+    public function cliente() 
+    {
+        return $this->belongsTo(Cliente::class, 'user_id');
+    }
 }

@@ -56,7 +56,32 @@
                     </ul>
                 </div>
             </li>
+            <li class="nav-item">
+                <a class="nav-link d-flex justify-content-between align-items-center {{ request()->routeIs('admin.pedidos*') ? 'active' : '' }}"
+                data-bs-toggle="collapse"
+                href="#pedidosSubmenu"
+                role="button"
+                aria-expanded="{{ request()->routeIs('admin.pedidos*') ? 'true' : 'false' }}"
+                aria-controls="pedidosSubmenu">
+                    <span>
+                        <i class="bi bi-cart3 me-2"></i> Pedidos
+                    </span>
+                    <i class="bi bi-chevron-down toggle-icon"></i>
+                </a>
 
+                <div class="collapse {{ request()->routeIs('admin.pedidos*') ? 'show' : '' }}"
+                    id="pedidosSubmenu"
+                    style="margin-left:20px; margin-top:5px;">
+                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                        <li>
+                            <a href="{{ route('admin.pedidos') }}"
+                            class="nav-link ps-4 {{ request()->routeIs('admin.pedidos') ? 'active' : '' }}">
+                                <i class="bi bi-list-check me-2"></i> Gestión de Pedidos
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
             <li class="nav-item">
                 <a class="nav-link d-flex justify-content-between align-items-center {{ $promocionesActive ? 'active' : '' }}"
                 data-bs-toggle="collapse"
@@ -82,6 +107,7 @@
                     </ul>
                 </div>
             </li>
+
             <li class="nav-item">
                 <a class="nav-link d-flex justify-content-between align-items-center {{ $usuariosActive ? 'active' : '' }}"
                 data-bs-toggle="collapse"

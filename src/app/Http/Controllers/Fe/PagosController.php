@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Fe;
 
 use App\Http\Controllers\Controller;
+use App\Models\Pagos;
 use App\Models\Pedido;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -165,42 +166,46 @@ class PagosController extends Controller
 
     public function confirmarPagoManual(Request $request)
     {
-        if ($request->status === 'approved') {
-            try {
-                DB::transaction(function () use ($request) {
-
-                    $pedido = Pedido::with('productos')
-                        ->where('id', $request->pedido_id)
-                        ->where('estado', 'pendiente')
-                        ->first();
-
-                    if ($pedido) {
-                        foreach ($pedido->productos as $producto) {
-                            $cantidadComprada = $producto->pivot->cantidad;
-
-                            DB::table('productos')
-                                ->where('id', $producto->id)
-                                ->decrement('stock', $cantidadComprada);
-                        }
-                        DB::table('pedidos')
-                            ->where('id', $request->pedido_id)
-                            ->update([
-                                'estado' => 'pagado',
-                                'payment_id' => $request->payment_id,
-                                'updated_at' => now()
-                            ]);
-                    }
-                });
-
-                return response()->json(['message' => 'Pago confirmado y stock descontado con éxito']);
-            } catch (\Exception $e) {
-                return response()->json([
-                    'message' => 'Error al procesar el stock',
-                    'error' => $e->getMessage()
-                ], 500);
-            }
+        if ($request->status !== 'approved') {
+            return response()->json(['message' => 'El pago no está aprobado'], 400);
         }
 
-        return response()->json(['message' => 'El pago no está aprobado'], 400);
+        try {
+            return DB::transaction(function () use ($request) {
+                $pedido = Pedido::with('productos')
+                    ->where('id', $request->pedido_id)
+                    ->where('estado', 'pendiente')
+                    ->lockForUpdate()
+                    ->first();
+
+                if (!$pedido) {
+                    return response()->json(['message' => 'Pedido no encontrado o ya procesado'], 200);
+                }
+
+                $totalCalculado = 0;
+
+                foreach ($pedido->productos as $producto) {
+                    $cantidad = $producto->pivot->cantidad;
+                    $precioUnitario = $producto->price;
+                    $totalCalculado += ($cantidad * $precioUnitario);
+                    DB::table('productos')
+                        ->where('id', $producto->id)
+                        ->decrement('stock', $cantidad);
+                }
+
+                Pagos::create([
+                    'pedido_id'          => $pedido->id,
+                    'user_id'            => $pedido->user_id,
+                    'total'              => $totalCalculado,
+                    'numero_transaccion' => $request->payment_id,
+                ]);
+
+                $pedido->update(['estado' => 'pagado']);
+
+                return response()->json(['message' => 'Pago registrado y stock actualizado']);
+            });
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error interno', 'error' => $e->getMessage()], 500);
+        }
     }
 }

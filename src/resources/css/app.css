@@ -559,23 +559,30 @@ body {
   color: #ffffff;
   transform: translateY(-2px);
 }
-
 /* -------------------- Carrusel -------------------- */
+.featured-section {
+  border: 2px solid #f39237; 
+  border-radius: 20px;
+  padding: 30px;
+  margin: 20px 0;
+  position: relative;
+}
+
 .carousel-wrapper {
   position: relative;
-  padding: 0 30px;
-  /* Más espacio para las flechas laterales */
+  padding: 0 100px; 
 }
 
 .carousel {
   display: flex;
-  gap: 24px;
+  gap: 20px; 
   overflow-x: auto;
   scroll-behavior: smooth;
   padding: 15px 5px;
-  /* Espacio para que el hover de las cards no se corte */
   scrollbar-width: none;
   -ms-overflow-style: none;
+
+  align-items: stretch;
 }
 
 .carousel::-webkit-scrollbar {
@@ -583,9 +590,9 @@ body {
 }
 
 .carousel-item {
-  min-width: 280px;
-  /* Ancho consistente con las cards que diseñamos antes */
-  flex-shrink: 0;
+
+  flex: 0 0 calc(20% - 16px); 
+  min-width: 200px;
 }
 
 /* Botones del carrusel (Flechas) */
@@ -594,39 +601,32 @@ body {
   top: 50%;
   transform: translateY(-50%);
   background: #f39237;
-  /* Naranja ShopTudo */
   color: #ffffff;
   border: none;
   border-radius: 50%;
-  width: 45px;
-  height: 45px;
-  font-size: 1.8rem;
-  line-height: 1;
+  width: 40px;
+  height: 40px;
+  font-size: 1.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  z-index: 5;
-  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  box-shadow: 0 4px 12px rgba(243, 146, 55, 0.3);
+  z-index: 10;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.carousel-btn.left {
+  left: -20px; 
+}
+
+.carousel-btn.right {
+  right: -20px;
 }
 
 .carousel-btn:hover {
   background: #e67e22;
   transform: translateY(-50%) scale(1.1);
-  box-shadow: 0 6px 15px rgba(243, 146, 55, 0.4);
-}
-
-.carousel-btn:active {
-  transform: translateY(-50%) scale(0.95);
-}
-
-.carousel-btn.left {
-  left: -5px;
-}
-
-.carousel-btn.right {
-  right: -5px;
 }
 
 
@@ -636,21 +636,20 @@ body {
   position: absolute;
   top: 0;
   bottom: 0;
-  width: 30px;
-  z-index: 1;
+  width: 40px;
+  z-index: 2;
   pointer-events: none;
 }
 
 .carousel-wrapper::before {
-  left: 30px;
-  background: linear-gradient(to right, rgba(255, 255, 255, 0.8), transparent);
+  left: 0;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.9), transparent);
 }
 
 .carousel-wrapper::after {
-  right: 30px;
-  background: linear-gradient(to left, rgba(255, 255, 255, 0.8), transparent);
+  right: 0;
+  background: linear-gradient(to left, rgba(255, 255, 255, 0.9), transparent);
 }
-
 .featured-card-pro {
   display: flex;
   flex-direction: column;
@@ -1112,65 +1111,7 @@ body {
   transform: scale(1.05);
 }
 
-/* Contenedor de Información */
-.featured-card__content {
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1;
-  gap: 12px;
-}
 
-.featured-card__title {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 700;
-  color: #0d1b3e;
-  line-height: 1.4;
-
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  min-height: 2.8em;
-}
-
-
-.featured-card__footer {
-  margin-top: auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-top: 10px;
-  border-top: 1px dashed #eee;
-}
-
-.featured-card__price {
-  font-size: 1.2rem;
-  font-weight: 800;
-  color: #0d1b3e;
-}
-
-/* Badges de Stock */
-.featured-card__stock {
-  font-size: 0.75rem;
-}
-
-.featured-card__stock--available {
-  background: #e7f5ff;
-  color: #1a305e;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-weight: 600;
-}
-
-.featured-card__stock--out {
-  background: #fff5f5;
-  color: #fa5252;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-weight: 600;
-}
 
 /*Cargando ProductDetail*/
 .loader-container {
@@ -3585,17 +3526,16 @@ body {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid #f0f0f0;
   height: 100%;
-  max-width: 280px; /* Tamaño ideal para el grid */
+  max-width: 280px;
   margin: 0 auto;
 }
 
 .featured-card:hover {
   transform: translateY(-8px);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
-  border-color: #F97316; /* Tu naranja de marca */
+  border-color: #F97316;
 }
 
-/* Imagen centrada y escalada */
 .featured-card__image-wrapper {
   position: relative;
   aspect-ratio: 1 / 1;
@@ -3610,7 +3550,7 @@ body {
 .featured-card__image {
   max-width: 100%;
   max-height: 100%;
-  object-fit: contain; /* Para que la mochila no se corte */
+  object-fit: contain; 
   transition: transform 0.5s ease;
 }
 
@@ -3618,29 +3558,28 @@ body {
   transform: scale(1.1);
 }
 
-/* Contenido con jerarquía */
+
 .featured-card__content {
   padding: 16px;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
-  text-align: center; /* Centrado de textos */
+  text-align: center; 
 }
 
 .featured-card__title {
   margin: 0 0 12px 0;
   font-size: 1rem;
   font-weight: 600;
-  color: #1f2937; /* Gris oscuro elegante */
+  color: #1f2937; 
   line-height: 1.4;
-  height: 2.8em; /* Reserva espacio para 2 líneas */
+  height: 2.8em; 
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
-/* Grupo de Precio y Stock alineado */
 .featured-card__info-group {
   margin-top: auto;
   display: flex;
@@ -3664,16 +3603,16 @@ body {
 }
 
 .featured-card__stock.is-available {
-  color: #059669; /* Verde éxito */
+  color: #059669; 
   background-color: #ecfdf5;
 }
 
 .featured-card__stock.is-out {
-  color: #dc2626; /* Rojo error */
+  color: #dc2626;
   background-color: #fef2f2;
 }
 
-/* Badge de últimas unidades */
+
 .featured-card__badge {
   position: absolute;
   top: 10px;
@@ -3685,4 +3624,50 @@ body {
   padding: 4px 8px;
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+
+.filter-chip {
+  background-color: #e0e0e0;
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: background 0.2s;
+}
+
+.filter-chip:hover {
+  background-color: #d4d4d4;
+  color: #ff4d4d; 
+}
+
+.filter-chip span {
+  margin-right: 4px;
+}
+
+.featured-card__price--colored {
+  color: #1a2a6c; 
+  font-weight: 800;
+  font-size: 1.1rem;
+}
+.featured-card__stock--colored {
+  color: #555;
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-top: 5px;
+  /* Si quieres que parezca una etiqueta, descomenta las siguientes líneas: */
+  /*
+  background: #f0f0f0;
+  padding: 2px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  */
 }

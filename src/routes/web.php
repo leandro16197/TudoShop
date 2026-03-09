@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\MarcaController;
 use App\Http\Controllers\Admin\OfertaController ;
 use App\Http\Controllers\Admin\ClienteController;
 use App\Http\Controllers\Admin\ConfiguracionController;
+use App\Http\Controllers\Admin\PedidosController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -25,6 +26,7 @@ Route::get('/panel/ofertas', [OfertaController::class, 'index'])->name('admin.of
 Route::get('/panel/marcas', [MarcaController::class,'index'])->name('admin.marcas');
 Route::get('/panel/clientes', [ClienteController::class, 'index'])->name('admin.clientes');
 Route::get('/panel/configuracion', [ConfiguracionController::class, 'index'])->name('admin.configuracion.general');
+Route::get('/panel/pedidos', [PedidosController::class, 'index'])->name('admin.pedidos');
 
 Route::middleware(['auth', 'verified'])
     ->prefix('frontend/v2')

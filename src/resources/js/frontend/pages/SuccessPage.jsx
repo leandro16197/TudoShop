@@ -51,19 +51,12 @@ const SuccessPage = () => {
     return (
 
         <div className="success-container">
-
             <div className="success-card">
-
                 <div className="success-header">
-
                     {loading ? (
-
                         <div className="loader"></div>
-
                     ) : (
-
                         <div className="success-icon">
-
                             <svg
                                 viewBox="0 0 24 24"
                                 fill="none"
@@ -75,13 +68,9 @@ const SuccessPage = () => {
                                     strokeLinejoin="round"
                                     d="M5 13l4 4L19 7"
                                 />
-
                             </svg>
-
                         </div>
-
                     )}
-
                     {!loading && (
                         <>
                             <h2>¡Pago aprobado!</h2>
@@ -90,15 +79,10 @@ const SuccessPage = () => {
                     )}
 
                 </div>
-
                 {!loading && (
-
                     <div className="success-body">
-
                         <div className="success-info">
-
                             <h4>Detalle de la operación</h4>
-
                             <div className="info-row">
                                 <span>Orden</span>
                                 <b>#{pedidoId}</b>
@@ -115,7 +99,6 @@ const SuccessPage = () => {
                             </div>
 
                         </div>
-
                         <div className="success-buttons">
 
                             <Link to="/perfil" className="btn-primary">
@@ -127,17 +110,11 @@ const SuccessPage = () => {
                             </Link>
 
                         </div>
-
                     </div>
-
                 )}
-
-            </div>
-
+             </div>
         </div>
-
     );
-
 };
 
 export default SuccessPage;

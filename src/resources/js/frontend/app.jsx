@@ -32,12 +32,10 @@ export default function App() {
       <CartProvider>
         <AuthProvider>
           <Navbar /> 
-          
           <main className="app-content">
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/home" element={<Home />} />
-              
               <Route path="/catalogo" element={<Catalogo />} />
               <Route path="/productos/:id" element={<ProductDetail />} />
               <Route path="/login" element={<Login />} />

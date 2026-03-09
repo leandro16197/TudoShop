@@ -158,7 +158,13 @@ export default function ProductDetail() {
                                     </div>
                                 </div>
                             </div>
-                            <button className="details-btn">
+                            <button 
+                                className="details-btn"
+                                onClick={async () => {
+                                    await handleAddToCart(); 
+                                    navigate("/checkout");
+                                }}
+                            >
                                 COMPRAR AHORA
                             </button>
                         </div>
