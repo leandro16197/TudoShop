@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\OfertaController ;
 use App\Http\Controllers\Admin\ClienteController;
 use App\Http\Controllers\Admin\ConfiguracionController;
 use App\Http\Controllers\Admin\PedidosController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -52,6 +53,8 @@ Route::middleware(['auth', 'verified'])
         Route::post('clientes/{id}', [ClienteController::class, 'update'])->name('clientes.update');
         Route::delete('clientes/{id}', [ClienteController::class, 'destroy'])->name('clientes.destroy');
         Route::post('configuracion/update', [ConfiguracionController::class, 'update'])->name('admin.configuracion.update');
+        Route::get('/panel/metricas', [DashboardController::class, 'metricas'])->name('admin.dashboard.metrics');
+        Route::get('/panel/ventas-semana', [DashboardController::class, 'ventasSemana']);
 
 });
 Route::view('/{any}', 'frontend.home')
