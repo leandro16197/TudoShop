@@ -36,14 +36,34 @@ class DashboardController extends Controller
             'top_productos' => $topProductos
         ]);
     }
-    public function ventasSemana()
+    public function ventasMes()
     {
-        $ventas = Pagos::selectRaw('DATE(created_at) as fecha, SUM(total) as total')
-            ->where('created_at', '>=', Carbon::now()->subDays(7))
-            ->groupBy('fecha')
-            ->orderBy('fecha')
-            ->get();
+        $start = Carbon::now()->subDays(29)->startOfDay();
+        $end = Carbon::now()->endOfDay();
 
-        return response()->json($ventas);
+        $ventas = Pagos::selectRaw("
+                DATE(created_at) as fecha,
+                COUNT(*) as pedidos,
+                SUM(total) as total
+            ")
+            ->whereBetween('created_at', [$start, $end])
+            ->groupBy(\DB::raw('DATE(created_at)'))
+            ->orderBy('fecha')
+            ->get()
+            ->keyBy('fecha');
+
+        $dias = [];
+
+        for ($i = 0; $i < 30; $i++) {
+            $fecha = Carbon::now()->subDays(29 - $i)->format('Y-m-d');
+
+            $dias[] = [
+                'fecha' => $fecha,
+                'pedidos' => $ventas[$fecha]->pedidos ?? 0,
+                'total' => $ventas[$fecha]->total ?? 0
+            ];
+        }
+
+        return response()->json($dias);
     }
 }

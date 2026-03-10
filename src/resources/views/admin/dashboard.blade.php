@@ -3,11 +3,39 @@
 @section('header')
 <h2>Bienvenido al Panel</h2>
 @endsection
+<style>
+    .dashboard-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr); 
+        gap: 20px;
+        width: 100%;
+    }
+    .metric {
+        min-width: 0; 
+        margin-bottom: 0; 
+    }
 
+    .chart-card {
+        grid-column: 1 / -1; 
+        width: 100% !important;
+        min-height: 400px;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 350px;
+        width: 100%;
+    }
+
+    @media (max-width: 992px) {
+        .dashboard-container {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
 @section('content')
 
-<div class="dashboard-cards">
-
+<div class="dashboard-container">
     <div class="card metric">
         <div class="metric-title">Ventas Hoy</div>
         <div class="metric-value" id="ventasHoy">$0</div>
@@ -27,11 +55,18 @@
         <div class="metric-title">Pedidos Pendientes</div>
         <div class="metric-value" id="pedidosPendientes">0</div>
     </div>
-    <div class="card" style="margin-top:30px;">
-    <div class="metric-title">Ventas últimos 7 días</div>
-    <canvas id="ventasChart"></canvas>
+
+    <div class="card chart-card">
+        <div class="chart-header">
+            <h3>Ventas últimos 30 días</h3>
+            <span class="chart-sub">Ingresos y pedidos diarios</span>
+        </div>
+        <div class="chart-container">
+            <canvas id="ventasChart"></canvas>
+        </div>
+    </div>
 </div>
-</div>
+
 <script>
 
     document.addEventListener('DOMContentLoaded', function () {
@@ -50,63 +85,91 @@
     })
     document.addEventListener('DOMContentLoaded', function () {
 
-        fetch('/frontend/v2/panel/ventas-semana')
-            .then(res => res.json())
-            .then(data => {
+        fetch('frontend/v2/panel/ventas-mes')
+        .then(res => res.json())
+        .then(data => {
 
-                const labels = data.map(item => item.fecha)
-                const ventas = data.map(item => item.total)
+            const labels = data.map(i => i.fecha)
+            const ventas = data.map(i => i.total)
+            const pedidos = data.map(i => i.pedidos)
 
-                const ctx = document.getElementById('ventasChart').getContext('2d')
+            const ctx = document.getElementById('ventasChart')
 
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Ventas',
-                            data: ventas,
-                            borderColor: '#22c55e',
-                            backgroundColor: 'rgba(34,197,94,0.15)',
-                            borderWidth: 3,
-                            tension: 0.4,
-                            pointRadius: 4,
-                            pointBackgroundColor: '#22c55e',
-                            fill: true
-                        }]
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                    {
+                        label: 'Ventas $',
+                        data: ventas,
+                        borderColor: '#22c55e',
+                        backgroundColor: 'rgba(34,197,94,0.15)',
+                        borderWidth: 3,
+                        tension: 0.35,
+                        pointRadius: 3,
+                        fill: true
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio:false,
-                        plugins:{
-                            legend:{
-                                display:false
+                    {
+                        label: 'Pedidos',
+                        data: pedidos,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59,130,246,0.15)',
+                        borderWidth: 2,
+                        tension: 0.35,
+                        pointRadius: 3,
+                        fill: false
+                    }]
+                },
+
+                options: {
+
+                    interaction:{
+                        mode:'index',
+                        intersect:false
+                    },
+
+                    responsive:true,
+                    maintainAspectRatio:false,
+
+                    plugins:{
+                        legend:{
+                            labels:{
+                                color:'#cbd5f5'
                             }
                         },
-                        scales:{
-                            x:{
-                                ticks:{
-                                    color:'#94a3b8'
-                                },
-                                grid:{
-                                    color:'rgba(255,255,255,0.05)'
-                                }
-                            },
-                            y:{
-                                ticks:{
-                                    color:'#94a3b8'
-                                },
-                                grid:{
-                                    color:'rgba(255,255,255,0.05)'
+                        tooltip:{
+                            backgroundColor:'#020617',
+                            borderColor:'#1e293b',
+                            borderWidth:1,
+                            callbacks:{
+                                label:function(context){
+                                    let value = context.raw.toLocaleString()
+                                    return context.dataset.label + ": $" + value
                                 }
                             }
                         }
-                    }
-                });
+                    },
 
+                    scales:{
+                        x:{
+                            ticks:{color:'#94a3b8'},
+                            grid:{color:'rgba(255,255,255,0.05)'}
+                        },
+                        y:{
+                            ticks:{
+                                color:'#94a3b8',
+                                callback:value => "$" + value.toLocaleString()
+                            },
+                            grid:{color:'rgba(255,255,255,0.05)'}
+                        }
+                    }
+                }
             })
 
-    })
+        })
+
+        })
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
