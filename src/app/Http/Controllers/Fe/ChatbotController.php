@@ -11,7 +11,7 @@ use App\Models\Configuracion;
 
 class ChatbotController extends Controller
 {
-    public function index(Request $request)
+    public function indexPrueba(Request $request)
     {
       
         $mensajeFijo = "¡Hola! He encontrado estas cartucheras para ti:";
@@ -23,7 +23,7 @@ class ChatbotController extends Controller
             'message' => $mensajeFijo . "\n" . $listaProductos
         ]);
     }
-    public function indexs(Request $request)
+    public function index(Request $request)
     {  
         $userMessage = $request->input('message');
         Log::debug("User message: {$userMessage}");

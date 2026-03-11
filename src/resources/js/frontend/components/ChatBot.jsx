@@ -1,10 +1,20 @@
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import ReactMarkdown from "react-markdown"; 
+
 
 export default function Chatbot() {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [open, setOpen] = useState(false);
+    
+    useEffect(() => {
+        if (open && messages.length === 0) {
+            setMessages([{ 
+                text: "¡Hola! 👋 Soy tu asistente de ShopTudo. ¿Qué producto estás buscando hoy?", 
+                type: "bot" 
+            }]);
+        }
+    }, [open]);
 
     const enviarMensaje = async () => {
         if (!input.trim()) return;
