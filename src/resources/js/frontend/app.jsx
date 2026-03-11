@@ -14,6 +14,7 @@ import SuccessPage from './pages/SuccessPage';
 import ErrorPage from './pages/ErrorPage';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import Chatbot from "./components/ChatBot";
 import axios from 'axios';
 axios.defaults.baseURL = window.location.origin;
 axios.interceptors.request.use((config) => {
@@ -46,7 +47,7 @@ export default function App() {
               <Route path="/checkout/error" element={<ErrorPage />} />
             </Routes>
           </main>
-          
+          <Chatbot/>
           <Footer />
         </AuthProvider>
       </CartProvider>

@@ -3663,11 +3663,142 @@ body {
   font-weight: 700;
   font-size: 0.85rem;
   margin-top: 5px;
-  /* Si quieres que parezca una etiqueta, descomenta las siguientes líneas: */
-  /*
-  background: #f0f0f0;
-  padding: 2px 8px;
-  border-radius: 4px;
-  display: inline-block;
-  */
+
 }
+
+/*Chat Bot*/
+
+.chatbot-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    background: #f97316; 
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
+    z-index: 9998;
+    transition: transform 0.2s;
+}
+
+.chatbot-button:hover {
+    transform: scale(1.1);
+}
+
+
+.chatbot-modal {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 350px;
+    height: 450px;
+    background: #ffffff;
+    border: 2px solid #0f172a;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    z-index: 9999;
+}
+
+.chatbot-header {
+    background: #0f172a;
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+}
+
+.close {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+
+.chatbot-messages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    background: #f1f5f9;
+}
+
+.msg.bot {
+    background: #ffffff;
+    color: #0f172a;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    font-size: 13px;
+    border-left: 4px solid #0f172a;
+}
+
+.msg.user {
+    background: #0f172a;
+    color: white;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    text-align: right;
+    font-size: 13px;
+}
+
+
+.my-product-card {
+    background: white;
+    border: 1px solid #e2e8f0;
+    padding: 12px;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.my-product-card button {
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+    background: #f97316; 
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.my-product-card button:hover {
+    background: #ea580c;
+}
+
+.chatbot-input {
+    display: flex;
+    padding: 10px;
+    background: white;
+    border-top: 2px solid #0f172a;
+}
+
+.chatbot-input input {
+    flex: 1;
+    border: none;
+    outline: none;
+    padding: 5px;
+}
+
+.chatbot-input button {
+    background: #0f172a;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+/*Fin Chat Bot*/

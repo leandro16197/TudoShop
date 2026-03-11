@@ -86,35 +86,69 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-12">
-                <div class="admin-card shadow-sm">
-                    <div class="card-header border-0 py-4 px-4 d-flex align-items-center" style="background: linear-gradient(45deg, #009ee3, #007eb5);">
-                        <div class="header-icon-container bg-white me-3">
-                            <i class="bi bi-credit-card-2-back header-icon" style="color: #009ee3;"></i>
+            <div class="row g-4">
+                
+                <div class="col-lg-6">
+                    <div class="admin-card shadow-sm h-100">
+                        <div class="card-header border-0 py-4 px-4 d-flex align-items-center" style="background: linear-gradient(45deg, #009ee3, #007eb5);">
+                            <div class="header-icon-container bg-white me-3">
+                                <i class="bi bi-credit-card-2-back header-icon" style="color: #009ee3;"></i>
+                            </div>
+                            <div>
+                                <h5 class="mb-1 text-white fw-bold">Mercado Pago</h5>
+                                <span class="text-white-50 fs-7">Configuración de la pasarela de pagos</span>
+                            </div>
                         </div>
-                        <div>
-                            <h5 class="mb-1 text-white fw-bold">Mercado Pago</h5>
-                            <span class="text-white-50 fs-7">Configuración de la pasarela de pagos</span>
+                        <div class="card-body p-4">
+                            <div class="row">
+                                <div class="col-md-8 mb-4">
+                                    <label class="form-label text-muted fw-bold">Access Token de Producción</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-key text-primary"></i></span>
+                                        <input type="password" name="mp_access_token" class="form-control form-control-lg border-start-0 shadow-none" 
+                                            value="{{ $configs['mp_access_token'] ?? '' }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-4 mb-4">
+                                    <label class="form-label text-muted fw-bold">Entorno (Modo)</label>
+                                    <select name="mp_mode" class="form-select form-select-lg shadow-none">
+                                        <option value="sandbox" {{ ($configs['mp_mode'] ?? '') == 'sandbox' ? 'selected' : '' }}>Sandbox</option>
+                                        <option value="production" {{ ($configs['mp_mode'] ?? '') == 'production' ? 'selected' : '' }}>Producción</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="card-body p-4">
-                        <div class="row">
-                            <div class="col-md-8 mb-4">
-                                <label class="form-label text-muted fw-bold">Access Token de Producción</label>
-                                <div class="input-group">
-                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-key text-primary"></i></span>
-                                    <input type="password" name="mp_access_token" class="form-control form-control-lg border-start-0 shadow-none" 
-                                        value="{{ $configs['mp_access_token'] ?? '' }}" placeholder="APP_USR-XXXXXXXXXXXX-XXXXXX-XXXXXXXXXXXX-XXXXXXXX">
-                                </div>
-                                <small class="text-muted d-block mt-1">Obtén tu token en el <a href="https://www.mercadopago.com.ar/developers/panel" target="_blank" class="text-decoration-none">Panel de Desarrolladores</a>.</small>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="admin-card shadow-sm h-100">
+                        <div class="card-header border-0 py-4 px-4 d-flex align-items-center" style="background: linear-gradient(45deg, #6c5ce7, #a29bfe);">
+                            <div class="header-icon-container bg-white me-3">
+                                <i class="bi bi-robot header-icon" style="color: #6c5ce7;"></i>
                             </div>
-                            
-                            <div class="col-md-4 mb-4">
-                                <label class="form-label text-muted fw-bold">Entorno (Modo)</label>
-                                <select name="mp_mode" class="form-select form-select-lg shadow-none">
-                                    <option value="sandbox" {{ ($configs['mp_mode'] ?? '') == 'sandbox' ? 'selected' : '' }}>Pruebas (Sandbox)</option>
-                                    <option value="production" {{ ($configs['mp_mode'] ?? '') == 'production' ? 'selected' : '' }}>Producción (Ventas Reales)</option>
-                                </select>
+                            <div>
+                                <h5 class="mb-1 text-white fw-bold">Asistente Virtual (Chatbot)</h5>
+                                <span class="text-white-50 fs-7">Configuración de la IA para consultas</span>
+                            </div>
+                        </div>
+                        <div class="card-body p-4">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <label class="form-label text-muted fw-bold">Gemini API Key</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-key text-success"></i></span>
+                                        <input type="password" name="gemini_api_key" class="form-control form-control-lg border-start-0 shadow-none" 
+                                            value="{{ $configs['gemini_api_key'] ?? '' }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label text-muted fw-bold">Estado</label>
+                                    <select name="bot_status" class="form-select form-select-lg shadow-none">
+                                        <option value="1" {{ ($configs['bot_status'] ?? '') == 1 ? 'selected' : '' }}>Activado</option>
+                                        <option value="0" {{ ($configs['bot_status'] ?? '') == 0 ? 'selected' : '' }}>Desactivado</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>

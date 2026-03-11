@@ -5,6 +5,7 @@ use App\Http\Controllers\Fe\FeCategoriasController as FeCategoriasController;
 use App\Http\Controllers\Fe\FeMarcasController as FeMarcasController;
 use App\Http\Controllers\Fe\FeClientesController;
 use App\Http\Controllers\Fe\AuthClienteController;
+use App\Http\Controllers\Fe\ChatbotController;
 use App\Http\Controllers\FE\EnvioController;
 use App\Http\Controllers\Fe\PedidoController;
 use App\Http\Controllers\Fe\PagosController;
@@ -39,4 +40,5 @@ Route::prefix('frontend/v1')->group(function () {
     Route::get('marcas', [FeMarcasController::class, 'index']);
     Route::post('/mp/webhook', [PagosController::class, 'webhook']);
     Route::post('/pedidos/confirmar-pago', [PagosController::class, 'confirmarPagoManual']);
+    Route::post('/chatbot', [ChatbotController::class, 'index']);
 });
