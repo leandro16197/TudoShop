@@ -73,36 +73,21 @@
             ],
         
             initComplete: function() {
-                // 1. Extraemos tus filtros y aseguramos que sean visibles
                 var filtros = $('#contenedorFiltros').detach().removeClass('d-none'); 
-                
-                // 2. Identificamos la fila superior y aplicamos flexbox de Bootstrap para separar los hijos
                 var filaNativa = $('.dataTables_wrapper .row:first-child');
                 filaNativa.addClass('d-flex justify-content-between align-items-center');
-                
-                // 3. Obtenemos los contenedores de Buscador y Cantidad
                 var divCantidad = filaNativa.find('.dataTables_length').parent();
                 var divBuscador = filaNativa.find('.dataTables_filter').parent();
-
-                // 4. Reordenamos físicamente para que el buscador sea el primero y la cantidad el último
                 filaNativa.prepend(divBuscador); 
                 filaNativa.append(divCantidad);  
-
-                // 5. Ajustamos las columnas y forzamos la alineación extrema
-                // Buscador a la izquierda total
                 divBuscador.removeClass('col-md-6').addClass('col-md-3 d-flex justify-content-start');
                 
-                // Cantidad a la derecha total
                 divCantidad.removeClass('col-md-6').addClass('col-md-3 d-flex justify-content-end');
-
-                // 6. Inyectamos tus filtros en el medio (col-md-6)
                 divBuscador.after(
                     '<div class="col-md-6 d-flex justify-content-center align-items-center gap-2">' + 
                         filtros.html() + 
                     '</div>'
                 );
-                
-                // 7. Limpieza de estilos de DataTables que meten márgenes extra
                 $('.dataTables_filter, .dataTables_length').css({
                     'margin': '0',
                     'width': 'auto'
