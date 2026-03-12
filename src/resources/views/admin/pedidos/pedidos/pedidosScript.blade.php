@@ -19,12 +19,11 @@
         var pedidosTable = $('#pedidosTable').DataTable({
             dom: '<"row"<"col-md-6"l><"col-md-6"f>>rtip',
             responsive: true,
-            language: { url: "/js/es-ES.json" },
+            language: { url: "/js/es-ES.json" ,lengthMenu: "_MENU_"},
             ajax: {
                 url: $('#pedidosTable').data('url'),
                 type: 'GET',
                 data: function(d) {
-                 
                     d.estado = $('#filterEstado').val();
                     d.desde = $('#filterDesde').val();
                     d.hasta = $('#filterHasta').val();
@@ -56,7 +55,7 @@
                 { data: 'total', render: data => `$${parseFloat(data).toFixed(2)}` },
                 { data: 'transaccion' },
                 { data: 'fecha' },
-                {
+                /*{
                     data: 'id',
                     orderable: false,
                     render: data => `
@@ -69,38 +68,41 @@
                             </ul>
                         </div>
                     `
-                }
+                }*/
             ],
         
             initComplete: function() {
                 var filtros = $('#contenedorFiltros').detach().removeClass('d-none'); 
                 var filaNativa = $('.dataTables_wrapper .row:first-child');
                 filaNativa.addClass('d-flex justify-content-between align-items-center');
+                
                 var divCantidad = filaNativa.find('.dataTables_length').parent();
                 var divBuscador = filaNativa.find('.dataTables_filter').parent();
+
                 filaNativa.prepend(divBuscador); 
                 filaNativa.append(divCantidad);  
+
                 divBuscador.removeClass('col-md-6').addClass('col-md-3 d-flex justify-content-start');
                 
-                divCantidad.removeClass('col-md-6').addClass('col-md-3 d-flex justify-content-end');
+                divCantidad.removeClass('col-md-6').addClass('col-md-3 d-flex justify-content-end align-items-center gap-2');
+                divCantidad.prepend(`
+                    <button type="button" id="btnExportarBackend" class="btn btn-success btn-sm d-flex align-items-center gap-1">
+                        <i class="bi bi-file-earmark-excel"></i> Exportar
+                    </button>
+                `);
+
                 divBuscador.after(
                     '<div class="col-md-6 d-flex justify-content-center align-items-center gap-2">' + 
                         filtros.html() + 
                     '</div>'
                 );
-                $('.dataTables_filter, .dataTables_length').css({
-                    'margin': '0',
-                    'width': 'auto'
-                });
-                $('.dataTables_filter label, .dataTables_length label').css({
-                    'margin': '0',
-                    'display': 'flex',
-                    'align-items': 'center',
-                    'gap': '8px'
-                });
+                $('.dataTables_filter, .dataTables_length').css({ 'margin': '0', 'width': 'auto' });
             }
         });
 
+        $(document).on('change', '#filterEstado, #filterDesde, #filterHasta', function() {
+            pedidosTable.ajax.reload(); 
+        });
 
         $('#filterEstado, #filterDesde, #filterHasta').on('change', function() {
             pedidosTable.ajax.reload();
@@ -130,5 +132,92 @@
                 complete: function () { hideLoading(); }
             });
         });
+        $(document).on('click', '#btnExportarBackend', function() {
+            const datosExportacion = {
+                estado: $('#filterEstado').val(),
+                desde: $('#filterDesde').val(),
+                hasta: $('#filterHasta').val(),
+                exportar: 'yes', 
+                _token: $('meta[name="csrf-token"]').attr('content') 
+            };
+
+         
+            $(this).prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Procesando...');
+
+            $.ajax({
+                url: $('#pedidosTable').data('url'), 
+                type: 'GET', 
+                data: datosExportacion,
+                success: function(response) {
+                    appCustom.smallBox('ok', 'Exportación iniciada. Recibirás un aviso al finalizar.', null, 4000);
+                },
+                error: function() {
+                    appCustom.smallBox('nok', 'Error al solicitar la exportación', null, 4000);
+                },
+                complete: function() {
+                    $('#btnExportarBackend').prop('disabled', false).html('<i class="bi bi-file-earmark-excel"></i> Exportar');
+                }
+            });
+        });
+
+
+        $(document).on('click', '#btnExportarBackend', function() {
+            const datosExportacion = {
+                estado: $('#filterEstado').val(),
+                desde: $('#filterDesde').val(),
+                hasta: $('#filterHasta').val(),
+                exportExcel: 'true',
+                _token: $('meta[name="csrf-token"]').attr('content')
+            };
+
+            const $btn = $(this);
+            $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Procesando...');
+            
+            $('#downloadLinkArea').empty();
+            $('#exportStatusContainer').show();
+            $('#progressBar').css({'width': '0%', 'background-color': '#0d6efd'});
+
+            $.ajax({
+                url: $('#pedidosTable').data('url'),
+                type: 'GET',
+                data: datosExportacion,
+                success: function(response) {
+                    appCustom.smallBox('ok', 'Exportación iniciada...', null, 3000);
+                    
+                    let interval = setInterval(function() {
+                        fetch('/frontend/v2/pedidos/check-progress')
+                            .then(response => response.json())
+                            .then(data => {
+                                $('#progressBar').css('width', data.progress + '%');
+                                $('#statusText').text(data.status);
+                                if (data.progress >= 100) {
+                                    clearInterval(interval);
+                                    $btn.prop('disabled', false).html('<i class="bi bi-file-earmark-excel"></i> Exportar');
+                                    
+                                    if (data.url) {
+                                        $('#progressBar').css('background-color', '#198754');
+                                        $('#downloadLinkArea').html(`
+                                            <a href="${data.url}" class="btn btn-success mt-2" download>
+                                                <i class="bi bi-download"></i> Descargar Excel
+                                            </a>
+                                        `);
+                                    }
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error en polling:', error);
+                                clearInterval(interval);
+                                $btn.prop('disabled', false).html('<i class="bi bi-file-earmark-excel"></i> Exportar');
+                            });
+                    }, 2000);
+                },
+                error: function() {
+                    $('#exportStatusContainer').hide(); // Ocultar si falla
+                    appCustom.smallBox('nok', 'Error al iniciar la exportación', null, 4000);
+                    $btn.prop('disabled', false).html('<i class="bi bi-file-earmark-excel"></i> Exportar');
+                }
+            });
+        });
     });
+
 </script>
