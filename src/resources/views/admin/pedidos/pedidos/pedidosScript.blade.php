@@ -1,3 +1,14 @@
+<style>
+    .bg-warning{
+       background-color: rgb(147 110 0) !important;
+    }
+    .dataTables_length{
+        width: 300px;
+    }
+    .row.d-flex.justify-content-between.align-items-center{
+        margin-bottom: 20px;
+    }
+</style>
 <script>
     $(document).ready(function() {
         showLoading();
@@ -6,11 +17,18 @@
         function hideLoading() { $('#loadingGif').removeClass('show'); }
 
         var pedidosTable = $('#pedidosTable').DataTable({
+            dom: '<"row"<"col-md-6"l><"col-md-6"f>>rtip',
             responsive: true,
             language: { url: "/js/es-ES.json" },
             ajax: {
                 url: $('#pedidosTable').data('url'),
                 type: 'GET',
+                data: function(d) {
+                 
+                    d.estado = $('#filterEstado').val();
+                    d.desde = $('#filterDesde').val();
+                    d.hasta = $('#filterHasta').val();
+                },
                 dataSrc: 'data',
                 complete: function () { hideLoading(); },
                 error: function () {
@@ -23,7 +41,18 @@
                 { data: 'id' },
                 { data: 'cliente' },
                 { data: 'email' },
-                { data: 'estado', render: data => `<span class="badge ${data === 'pagado' ? 'bg-success' : 'bg-danger'}">${data}</span>` },
+                { 
+                    data: 'estado', 
+                    render: data => {
+                        const statusColors = {
+                            'pagado': 'bg-success', 
+                            'pendiente': 'bg-warning',  
+                            'rechazado': 'bg-danger'    
+                        };
+                        const badgeClass = statusColors[data] || 'bg-secondary';
+                        return `<span class="badge ${badgeClass}">${data}</span>`;
+                    } 
+                },
                 { data: 'total', render: data => `$${parseFloat(data).toFixed(2)}` },
                 { data: 'transaccion' },
                 { data: 'fecha' },
@@ -41,9 +70,56 @@
                         </div>
                     `
                 }
-            ]
+            ],
+        
+            initComplete: function() {
+                // 1. Extraemos tus filtros y aseguramos que sean visibles
+                var filtros = $('#contenedorFiltros').detach().removeClass('d-none'); 
+                
+                // 2. Identificamos la fila superior y aplicamos flexbox de Bootstrap para separar los hijos
+                var filaNativa = $('.dataTables_wrapper .row:first-child');
+                filaNativa.addClass('d-flex justify-content-between align-items-center');
+                
+                // 3. Obtenemos los contenedores de Buscador y Cantidad
+                var divCantidad = filaNativa.find('.dataTables_length').parent();
+                var divBuscador = filaNativa.find('.dataTables_filter').parent();
+
+                // 4. Reordenamos físicamente para que el buscador sea el primero y la cantidad el último
+                filaNativa.prepend(divBuscador); 
+                filaNativa.append(divCantidad);  
+
+                // 5. Ajustamos las columnas y forzamos la alineación extrema
+                // Buscador a la izquierda total
+                divBuscador.removeClass('col-md-6').addClass('col-md-3 d-flex justify-content-start');
+                
+                // Cantidad a la derecha total
+                divCantidad.removeClass('col-md-6').addClass('col-md-3 d-flex justify-content-end');
+
+                // 6. Inyectamos tus filtros en el medio (col-md-6)
+                divBuscador.after(
+                    '<div class="col-md-6 d-flex justify-content-center align-items-center gap-2">' + 
+                        filtros.html() + 
+                    '</div>'
+                );
+                
+                // 7. Limpieza de estilos de DataTables que meten márgenes extra
+                $('.dataTables_filter, .dataTables_length').css({
+                    'margin': '0',
+                    'width': 'auto'
+                });
+                $('.dataTables_filter label, .dataTables_length label').css({
+                    'margin': '0',
+                    'display': 'flex',
+                    'align-items': 'center',
+                    'gap': '8px'
+                });
+            }
         });
 
+
+        $('#filterEstado, #filterDesde, #filterHasta').on('change', function() {
+            pedidosTable.ajax.reload();
+        });
         let deletePedidoId = null;
         $('#pedidosTable').on('click', '.btn-delete', function () {
             deletePedidoId = $(this).data('id');
@@ -53,7 +129,6 @@
 
         $('#confirmDeletePedido').on('click', function () {
             if (!deletePedidoId) return;
-
             showLoading();
             $.ajax({
                 url: `/panel/pedidos/${deletePedidoId}`,

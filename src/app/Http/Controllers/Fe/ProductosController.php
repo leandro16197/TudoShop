@@ -7,14 +7,16 @@ use App\Models\Categoria;
 use App\Models\Marca;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use App\Traits\CalculadorDescuentos;
 
 class ProductosController extends Controller
 {
-    public function search(Request $request)
-    {
-        $query = $request->input('q', '');
+    use CalculadorDescuentos;
 
-        $productos = Product::with('imagenPrincipal')
+    public function search(Request $request)
+    {   
+        $query = $request->input('q', '');
+        $productos = Product::with(['imagenPrincipal', 'categorias'])
             ->when($query, function ($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%")
                 ->orWhere('description', 'like', "%{$query}%");
@@ -23,33 +25,40 @@ class ProductosController extends Controller
             ->limit(10)
             ->get()
             ->map(function ($producto) {
+                $precioFinal = $this->calcularPrecioFinal($producto, 1);
                 $imagen = $producto->imagenPrincipal
                     ? asset('storage/' . $producto->imagenPrincipal->imagen)
                     : null;
 
                 return [
-                    'id' => $producto->id,
-                    'nombre' => $producto->name,
-                    'descripcion' => $producto->description,
-                    'precio' => (float) $producto->price,
-                    'activo' => (bool) $producto->active,
-                    'stock' => $producto->stock,
-                    'imagen' => $imagen,
+                    'id'          => $producto->id,
+                    'nombre'      => $producto->name,
+                    'descripcion' => $producto->descripcion,
+                    'precio'      => (float) $precioFinal,
+                    'precio_orig' => (float) $producto->price, 
+                    'activo'      => (bool) $producto->active,
+                    'stock'       => $producto->stock,
+                    'imagen'      => $imagen,
                 ];
             });
 
         return response()->json($productos);
     }
 
-
     public function detail($id)
     {
-        $product = Product::with(['imagenes', 'categorias'])->findOrFail($id);
+
+        $product = Product::with(['imagenes', 'categorias', 'marcas'])->findOrFail($id);
+
+        $precioFinal = $this->calcularPrecioFinal($product, 1);
+        $tieneDescuento = $precioFinal < $product->price;
 
         return response()->json([
             'id'          => $product->id,
             'name'        => $product->name,
-            'price'       => $product->price,
+            'price'       => (float) $precioFinal, 
+            'original_price' => $tieneDescuento ? (float) $product->price : null, 
+            'has_discount' => $tieneDescuento,
             'stock'       => $product->stock,
             'description' => $product->description,
             'categorias'  => $product->categorias->map(fn ($cat) => [
@@ -60,17 +69,17 @@ class ProductosController extends Controller
                 asset('storage/' . $img->imagen)
             ),
             'features'    => [
-                'Marca' => 'Paper Mate',
+                'Marca' => $product->marca ? $product->marca->nombre : 'Sin marca',
             ],
         ]);
     }
 
     public function featured()
     {
-        $productos = Product::with('imagenPrincipal')
+        $productos = Product::with(['imagenPrincipal', 'categorias', 'marcas'])
             ->where('active', 1)
             ->orderBy('created_at', 'desc')
-            ->take(5)
+            ->take(10)
             ->get()
             ->map(function ($producto) {
 
@@ -78,12 +87,17 @@ class ProductosController extends Controller
                     ? asset('storage/' . $producto->imagenPrincipal->imagen)
                     : null;
 
+                $precioFinal = $this->calcularPrecioFinal($producto, 1);
+                $tieneDescuento = $precioFinal < $producto->price;
+
                 return [
-                    'id' => $producto->id,
-                    'nombre' => $producto->name,
-                    'precio' => (float) $producto->price,
-                    'stock' => $producto->stock,
-                    'imagen' => $imagen,
+                    'id'             => $producto->id,
+                    'nombre'         => $producto->name,
+                    'precio'         => (float) $precioFinal,
+                    'original_price' => $tieneDescuento ? (float) $producto->price : null,
+                    'has_discount'   => $tieneDescuento,
+                    'stock'          => $producto->stock,
+                    'imagen'         => $imagen,
                 ];
             });
 
@@ -96,30 +110,33 @@ class ProductosController extends Controller
         $productos = Product::whereHas('categorias', function ($query) use ($categoriaId) {
                 $query->where('categorias.id', $categoriaId);
             })
-            ->with('imagenes')
+            ->with(['imagenes', 'categorias', 'marcas'])
             ->take(12)
             ->get();
 
         return $productos->map(function ($producto) {
-
             $imagen = $producto->imagenes->first()
                 ? asset('storage/' . $producto->imagenes->first()->imagen)
                 : asset('images/no-image.webp');
+            $precioFinal = $this->calcularPrecioFinal($producto, 1);
+            $tieneDescuento = $precioFinal < $producto->price;
 
             return [
-                'id'          => $producto->id,
-                'nombre'      => $producto->name,
-                'descripcion' => $producto->description,
-                'precio'      => (float) $producto->price,
-                'activo'      => (bool) $producto->active,
-                'imagen'      => $imagen,
+                'id'             => $producto->id,
+                'nombre'         => $producto->name,
+                'descripcion'    => $producto->description,
+                'precio'         => (float) $precioFinal,
+                'original_price' => $tieneDescuento ? (float) $producto->price : null,
+                'has_discount'   => $tieneDescuento,
+                'activo'         => (bool) $producto->active,
+                'imagen'         => $imagen,
             ];
         });
     }
 
     public function catalogo(Request $request)
     {
-        $query = Product::with('imagenPrincipal', 'categorias')
+        $query = Product::with('imagenPrincipal', 'categorias', 'marcas')
             ->where('active', 1);
 
         //Filtro por texto
@@ -180,23 +197,59 @@ class ProductosController extends Controller
         //Paginación
         $productos = $query->paginate(12);
         $productos->getCollection()->transform(function ($producto) {
+            $precioFinal = $this->calcularPrecioFinal($producto, 1);
+            $tieneDescuento = $precioFinal < $producto->price;
 
             $imagen = $producto->imagenPrincipal
                 ? asset('storage/' . $producto->imagenPrincipal->imagen)
                 : null;
 
             return [
-                'id' => $producto->id,
-                'nombre' => $producto->name,
-                'descripcion' => $producto->description,
-                'precio' => (float) $producto->price,
-                'activo' => (bool) $producto->active,
-                'stock' =>$producto->stock,
-                'imagen' => $imagen,
+                'id'             => $producto->id,
+                'nombre'         => $producto->name,
+                'descripcion'    => $producto->description,
+                'precio'         => (float) $precioFinal,
+                'original_price' => $tieneDescuento ? (float) $producto->price : null,
+                'has_discount'   => $tieneDescuento,
+                'activo'         => (bool) $producto->active,
+                'stock'          => $producto->stock,
+                'imagen'         => $imagen,
             ];
         });
 
         return response()->json($productos);
     }
 
+    public function ofertas()
+    {
+        \Log::debug("ofertas");
+        $productos = Product::with(['imagenPrincipal', 'categorias', 'marcas'])
+            ->where('active', 1)
+            ->get()
+            ->filter(function ($producto) {
+                $precioFinal = $this->calcularPrecioFinal($producto, 1);
+                return $precioFinal < $producto->price;
+            })
+            ->map(function ($producto) {
+                $precioFinal = $this->calcularPrecioFinal($producto, 1);
+                $tieneDescuento = $precioFinal < $producto->price;
+
+                $imagen = $producto->imagenPrincipal
+                    ? asset('storage/' . $producto->imagenPrincipal->imagen)
+                    : null;
+
+                return [
+                    'id'             => $producto->id,
+                    'nombre'         => $producto->name,
+                    'precio'         => (float) $precioFinal,
+                    'original_price' => $tieneDescuento ? (float) $producto->price : null,
+                    'has_discount'   => $tieneDescuento,
+                    'stock'          => $producto->stock,
+                    'imagen'         => $imagen,
+                ];
+            })
+            ->values();
+
+        return response()->json($productos);
+    }
 }

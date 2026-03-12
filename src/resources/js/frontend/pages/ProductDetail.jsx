@@ -98,7 +98,17 @@ export default function ProductDetail() {
 
                         <div className="product-info product-info--compact">
                             <h1>{product.name}</h1>
-                            <p className="price">${Number(product.price).toLocaleString()}</p>
+                            <div className="price-container-detail">
+                                {product.has_discount && (
+                                    <span className="price-original-detail">
+                                    ${Number(product.original_price).toLocaleString()}
+                                    </span>
+                                )}
+
+                                <span className="price-final-detail">
+                                    ${Number(product.price).toLocaleString()}
+                                </span>
+                            </div>
                             
                             <p className="stock-tag">
                                 STOCK: {product.stock}
@@ -180,46 +190,52 @@ export default function ProductDetail() {
             {related.length > 0 && (
                 <div className="related-outer-wrapper">
                     <div className="related-container">
-                        <section className="related-section">
-                            <div className="related-header">
-                                <h2>Productos relacionados</h2>
+                    <section className="related-section">
+
+                        <div className="related-header">
+                        <h2>Productos relacionados</h2>
+                        </div>
+
+                        {loadingRelated ? (
+                        <div className="loader-mini"></div>
+                        ) : (
+                        <div className="related-carousel-wrapper">
+
+                            <button
+                            className="related-carousel-btn left"
+                            onClick={() => {
+                                document.querySelector('.related-carousel-track')
+                                .scrollBy({ left: -300, behavior: 'smooth' });
+                            }}
+                            >
+                            ‹
+                            </button>
+
+                            <div className="related-carousel-track">
+                            {related.map(item => (
+                                <div className="related-carousel-item" key={item.id}>
+                                <FeaturedProductCard product={item} />
+                                </div>
+                            ))}
                             </div>
 
-                            {loadingRelated ? (
-                                <div className="loader-mini"></div>
-                            ) : (
-                                <div className="carousel-wrapper">
-                                    <button
-                                        className="carousel-btn left"
-                                        onClick={() => {
-                                            document.querySelector('.related-carousel').scrollBy({ left: -300, behavior: 'smooth' });
-                                        }}
-                                    >
-                                        ‹
-                                    </button>
+                            <button
+                            className="related-carousel-btn right"
+                            onClick={() => {
+                                document.querySelector('.related-carousel-track')
+                                .scrollBy({ left: 300, behavior: 'smooth' });
+                            }}
+                            >
+                            ›
+                            </button>
 
-                                    <div className="related-carousel">
-                                        {related.map(item => (
-                                            <div className="carousel-item" key={item.id}>
-                                                <FeaturedProductCard product={item} />
-                                            </div>
-                                        ))}
-                                    </div>
+                        </div>
+                        )}
 
-                                    <button
-                                        className="carousel-btn right"
-                                        onClick={() => {
-                                            document.querySelector('.related-carousel').scrollBy({ left: 300, behavior: 'smooth' });
-                                        }}
-                                    >
-                                        ›
-                                    </button>
-                                </div>
-                            )}
-                        </section>
+                    </section>
                     </div>
                 </div>
-            )}
+                )}
             <Footer />
         </div>
     );

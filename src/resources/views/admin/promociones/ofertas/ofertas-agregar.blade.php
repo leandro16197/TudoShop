@@ -48,7 +48,44 @@
                      required>
             </div>
           </div>
+          <div class="row">
+              <div class="col-6 mb-3">
+                  <label class="form-label">Aplicar a Marca</label>
+                  <select name="marca_id" class="form-select bg-dark text-light border-secondary">
+                      <option value="">Ninguna</option>
+                      </select>
+              </div>
 
+              <div class="col-6 mb-3">
+                  <label class="form-label">Aplicar a Categoría</label>
+                  <select name="categoria_id" class="form-select bg-dark text-light border-secondary">
+                      <option value="">Ninguna</option>
+                      </select>
+              </div>
+          </div>
+          <div class="row">
+              <div class="col-6 mb-3">
+                  <label class="form-label">Descuento (%)</label>
+                  <input type="number" 
+                        name="porcentaje" 
+                        class="form-control bg-dark text-light border-secondary" 
+                        step="0.1" 
+                        min="0" 
+                        max="100" 
+                        placeholder="Ej: 10">
+              </div>
+
+              <div class="col-6 mb-3">
+                  <label class="form-label">Mínimo de unidades</label>
+                  <input type="number" 
+                        name="cantidad_minima" 
+                        class="form-control bg-dark text-light border-secondary" 
+                        min="1" 
+                        value="1">
+                  <small class="text-muted">Se aplicará si lleva esta cantidad o más.</small>
+              </div>
+          </div>
+          
           <div class="text-end">
             <button type="submit" class="btn btn-primary">
               Guardar
@@ -63,4 +100,29 @@
 </div>
 
 @push('scripts')
+<script>
+  $('#createOfertaModal').on('show.bs.modal', function () {
+      let $marcaSelect = $('select[name="marca_id"]');
+      let $catSelect = $('select[name="categoria_id"]');
+      $marcaSelect.html('<option>Cargando marcas...</option>');
+      $catSelect.html('<option>Cargando categorías...</option>');
+
+      $.ajax({
+          url: "{{ route('admin.ofertas.relaciones') }}", 
+          method: "GET",
+          success: function(data) {
+              $marcaSelect.empty().append('<option value="">Ninguna</option>');
+              $catSelect.empty().append('<option value="">Ninguna</option>');
+
+              $.each(data.marcas, function(i, m) {
+                  $marcaSelect.append(`<option value="${m.id}">${m.nombre}</option>`);
+              });
+
+              $.each(data.categorias, function(i, c) {
+                  $catSelect.append(`<option value="${c.id}">${c.nombre}</option>`);
+              });
+          }
+      });
+  });
+</script>
 @endpush

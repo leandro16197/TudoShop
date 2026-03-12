@@ -3667,138 +3667,375 @@ body {
 }
 
 /*Chat Bot*/
-
-.chatbot-button {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    border: none;
-    background: #f97316; 
-    color: white;
-    font-size: 24px;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
-    z-index: 9998;
-    transition: transform 0.2s;
+.chatbot-button{
+position:fixed;
+bottom:20px;
+right:20px;
+width:60px;
+height:60px;
+border-radius:50%;
+border:none;
+background:#f97316;
+color:white;
+font-size:24px;
+cursor:pointer;
+box-shadow:0 8px 25px rgba(249,115,22,0.35);
+z-index:9998;
+transition:all .25s ease;
 }
 
-.chatbot-button:hover {
-    transform: scale(1.1);
-}
-
-
-.chatbot-modal {
-    position: fixed;
-    bottom: 90px;
-    right: 20px;
-    width: 350px;
-    height: 450px;
-    background: #ffffff;
-    border: 2px solid #0f172a;
-    border-radius: 16px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    z-index: 9999;
-}
-
-.chatbot-header {
-    background: #0f172a;
-    color: white;
-    padding: 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-weight: bold;
-}
-
-.close {
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
+.chatbot-button:hover{
+transform:scale(1.08);
+box-shadow:0 12px 30px rgba(249,115,22,0.45);
 }
 
 
-.chatbot-messages {
-    flex: 1;
-    padding: 15px;
-    overflow-y: auto;
-    background: #f1f5f9;
+.chatbot-modal{
+position:fixed;
+bottom:90px;
+right:20px;
+width:360px;
+height:480px;
+background:#ffffff;
+border-radius:18px;
+display:flex;
+flex-direction:column;
+overflow:hidden;
+box-shadow:0 20px 40px rgba(0,0,0,0.2);
+z-index:9999;
+border:1px solid #e2e8f0;
 }
 
-.msg.bot {
-    background: #ffffff;
-    color: #0f172a;
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    font-size: 13px;
-    border-left: 4px solid #0f172a;
+.chatbot-header{
+background:#0f172a;
+color:white;
+padding:14px 18px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+font-weight:600;
+font-size:14px;
+letter-spacing:.3px;
 }
 
-.msg.user {
-    background: #0f172a;
-    color: white;
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 10px;
-    text-align: right;
-    font-size: 13px;
+.close{
+background:none;
+border:none;
+color:white;
+font-size:18px;
+cursor:pointer;
+opacity:.7;
+transition:.2s;
+}
+
+.close:hover{
+opacity:1;
+transform:scale(1.1);
+}
+
+.chatbot-messages{
+flex:1;
+padding:18px;
+overflow-y:auto;
+background:#f1f5f9;
+display:flex;
+flex-direction:column;
+gap:10px;
 }
 
 
-.my-product-card {
-    background: white;
-    border: 1px solid #e2e8f0;
-    padding: 12px;
-    border-radius: 10px;
-    text-align: center;
-    font-size: 13px;
-    margin-bottom: 8px;
+.msg.bot{
+background:white;
+color:#0f172a;
+padding:12px;
+border-radius:12px;
+font-size:13px;
+max-width:80%;
+box-shadow:0 2px 6px rgba(0,0,0,0.05);
 }
 
-.my-product-card button {
-    display: block;
-    width: 100%;
-    margin-top: 10px;
-    background: #f97316; 
-    color: white;
-    border: none;
-    padding: 8px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
+
+.msg.user{
+background:#0f172a;
+color:white;
+padding:12px;
+border-radius:12px;
+font-size:13px;
+align-self:flex-end;
+max-width:80%;
+box-shadow:0 4px 10px rgba(0,0,0,0.15);
 }
 
-.my-product-card button:hover {
-    background: #ea580c;
+
+.my-product-card{
+background:white;
+border-radius:12px;
+padding:14px;
+font-size:13px;
+text-align:center;
+border:1px solid #e2e8f0;
+box-shadow:0 4px 12px rgba(0,0,0,0.05);
+transition:.2s;
+margin-bottom:10px;
 }
 
-.chatbot-input {
-    display: flex;
-    padding: 10px;
-    background: white;
-    border-top: 2px solid #0f172a;
+.my-product-card:hover{
+transform:translateY(-2px);
+box-shadow:0 8px 18px rgba(0,0,0,0.08);
 }
 
-.chatbot-input input {
-    flex: 1;
-    border: none;
-    outline: none;
-    padding: 5px;
+.my-product-card strong{
+display:block;
+margin-bottom:5px;
+font-size:14px;
+color:#0f172a;
 }
 
-.chatbot-input button {
-    background: #0f172a;
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 6px;
-    cursor: pointer;
+.my-product-card button{
+margin-top:10px;
+background:#f97316;
+color:white;
+border:none;
+padding:9px;
+border-radius:8px;
+cursor:pointer;
+font-weight:600;
+transition:.2s;
+}
+
+.my-product-card button:hover{
+background:#ea580c;
+}
+
+.chatbot-input{
+display:flex;
+padding:10px;
+background:white;
+border-top:1px solid #e2e8f0;
+gap:8px;
+}
+
+.chatbot-input input{
+flex:1;
+border:1px solid #e2e8f0;
+border-radius:8px;
+padding:8px 10px;
+font-size:13px;
+outline:none;
+transition:.2s;
+}
+
+.chatbot-input input:focus{
+border-color:#f97316;
+box-shadow:0 0 0 2px rgba(249,115,22,0.15);
+}
+
+.chatbot-input button{
+background:#0f172a;
+color:white;
+border:none;
+padding:8px 14px;
+border-radius:8px;
+cursor:pointer;
+font-weight:600;
+transition:.2s;
+}
+
+.chatbot-input button:hover{
+background:#1e293b;
 }
 /*Fin Chat Bot*/
+
+.price-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
+.price-original {
+  font-size: 0.85rem;
+  color: #c62828;
+  text-decoration: line-through;
+  background: #ffe5e5;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.price-final {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #1ca04a;
+}
+
+.price-container-detail {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0 5px 0;
+  flex-wrap: wrap;
+}
+
+.price-original-detail {
+  font-size: 1rem;
+  color: #c62828;
+  text-decoration: line-through;
+  background: #ffe5e5;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.price-final-detail {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1ca04a;
+}
+
+.related-carousel-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.related-carousel-track {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  padding: 20px 10px;
+  scroll-behavior: smooth;
+  align-items: stretch;
+}
+
+.related-carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+.related-carousel-item {
+  flex: 0 0 260px;
+  display: flex;
+}
+
+.related-carousel-item .product-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.related-carousel-item .product-info {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.related-carousel-item .product-title {
+  min-height: 48px;
+}
+
+.related-carousel-item .product-description {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 40px;
+}
+
+.related-carousel-item .product-price-stock {
+  margin-top: auto;
+}
+
+.related-carousel-item .details-btn {
+  margin-top: 10px;
+}
+
+.related-carousel-btn {
+  position: absolute;
+  top: 45%;
+  transform: translateY(-50%);
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f08f2e;
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.related-carousel-btn.left {
+  left: -10px;
+}
+
+.related-carousel-btn.right {
+  right: -10px;
+}
+
+.related-carousel-btn:hover {
+  background: #e17c17;
+}
+
+.hero-banner {
+  width: 100%;
+}
+
+.hero-image {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.hero-features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.hero-feature {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #f6f7f9;
+  border-radius: 10px;
+  padding: 14px 16px;
+  border: 1px solid #e6e6e6;
+}
+
+.hero-feature .icon {
+  font-size: 22px;
+}
+
+.hero-feature strong {
+  font-size: 14px;
+  color: #1b1b1b;
+}
+
+.hero-feature p {
+  font-size: 12px;
+  margin: 2px 0 0;
+  color: #6b7280;
+}
+
+.ofertas-container {
+    padding: 40px 20px;
+    border: 2px solid #fd7e14; 
+    border-radius: 20px;
+    margin: 20px auto;
+    background: #fff;
+    max-width: 1200px;
+}
+
+.ofertas-section {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.grid-productos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}

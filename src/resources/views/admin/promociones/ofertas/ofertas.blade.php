@@ -27,6 +27,8 @@
                         <th>ID</th>
                         <th>Nombre</th>
                         <th>Descripción</th>
+                        <th>Marca</th>
+                        <th>Categoría</th>
                         <th>Fecha Desde</th>
                         <th>Fecha Hasta</th>
                         <th style="width: 155px !important;">Acciones</th>

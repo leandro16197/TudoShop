@@ -55,6 +55,7 @@ Route::middleware(['auth', 'verified'])
         Route::post('configuracion/update', [ConfiguracionController::class, 'update'])->name('admin.configuracion.update');
         Route::get('/panel/metricas', [DashboardController::class, 'metricas'])->name('admin.dashboard.metrics');
         Route::get('/panel/ventas-mes', [DashboardController::class, 'ventasMes']);
+        Route::get('/ofertas/relaciones', [OfertaController::class, 'relaciones'])->name('admin.ofertas.relaciones');
 
 });
 Route::view('/{any}', 'frontend.home')

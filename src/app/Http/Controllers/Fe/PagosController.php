@@ -10,9 +10,12 @@ use Illuminate\Support\Facades\DB;
 use MercadoPago\MercadoPagoConfig;
 use MercadoPago\Client\Preference\PreferenceClient;
 use MercadoPago\Client\Payment\PaymentClient;
+use App\Traits\CalculadorDescuentos;
 
 class PagosController extends Controller
 {
+    use CalculadorDescuentos;
+
     public function pagar(Request $request)
     {
         $configs = DB::table('configuracions')
@@ -25,7 +28,7 @@ class PagosController extends Controller
         }
 
         MercadoPagoConfig::setAccessToken($configs['mp_access_token']);
-        $pedido = Pedido::with(['productos', 'envio'])
+        $pedido = Pedido::with(['productos.marcas', 'productos.categorias', 'envio'])
             ->where('id', $request->id_pedido)
             ->where('user_id', $request->user()->id)
             ->first();
@@ -41,15 +44,15 @@ class PagosController extends Controller
         foreach ($pedido->productos as $producto) {
             $precio = round((float) $producto->price, 2);
             $cantidad = (int) $producto->pivot->cantidad;
-
+            $precioFinal = $this->calcularPrecioFinal($producto, $cantidad);
             if ($precio > 0 && $cantidad > 0) {
                 $items[] = [
                     "title" => (string) $producto->name,
                     "quantity" => $cantidad,
-                    "unit_price" => $precio,
+                    "unit_price" => round((float) $precioFinal, 2),
                     "currency_id" => "ARS"
                 ];
-                $subtotal += ($precio * $cantidad);
+                $subtotal += ($precioFinal * $cantidad);
             }
         }
 
@@ -122,6 +125,7 @@ class PagosController extends Controller
             ], 500);
         }
     }
+
     public function webhook(Request $request)
     {
 
@@ -172,7 +176,7 @@ class PagosController extends Controller
 
         try {
             return DB::transaction(function () use ($request) {
-                $pedido = Pedido::with('productos')
+                $pedido = Pedido::with(['productos.marcas', 'productos.categorias']) 
                     ->where('id', $request->pedido_id)
                     ->where('estado', 'pendiente')
                     ->lockForUpdate()
@@ -185,18 +189,17 @@ class PagosController extends Controller
                 $totalCalculado = 0;
 
                 foreach ($pedido->productos as $producto) {
-                    $cantidad = $producto->pivot->cantidad;
-                    $precioUnitario = $producto->price;
-                    $totalCalculado += ($cantidad * $precioUnitario);
+                    $cantidad = (int) $producto->pivot->cantidad;
+                    $precioFinal = $this->calcularPrecioFinal($producto, $cantidad);
+                    $totalCalculado += ($cantidad * $precioFinal);
                     DB::table('productos')
                         ->where('id', $producto->id)
                         ->decrement('stock', $cantidad);
                 }
-
                 Pagos::create([
                     'pedido_id'          => $pedido->id,
                     'user_id'            => $pedido->user_id,
-                    'total'              => $totalCalculado,
+                    'total'              => (float) $totalCalculado,
                     'numero_transaccion' => $request->payment_id,
                 ]);
 

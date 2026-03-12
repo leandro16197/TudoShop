@@ -57,6 +57,26 @@
                     searchable: false,
                     defaultContent: '-'
                 },
+                { 
+                    data: 'aplicaciones', 
+                    name: 'aplicaciones',
+                    render: function(data, type, row) {
+                        if (data && data.length > 0 && data[0].marca) {
+                            return data[0].marca.nombre;
+                        }
+                        return '-'; 
+                    }
+                },
+                {
+                    data: 'aplicaciones', 
+                    name: 'aplicaciones',
+                    render: function(data, type, row) {
+                        if (data && data.length > 0 && data[0].categoria) {
+                            return data[0].categoria.nombre;
+                        }
+                        return '-';
+                    }
+                },
                 {
                     data: 'fecha_desde',
                     defaultContent: '-'

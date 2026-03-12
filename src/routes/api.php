@@ -32,6 +32,7 @@ Route::prefix('frontend/v1')->group(function () {
     });
     
     Route::get('productos', [FeProductosController::class, 'search']);
+    Route::get('productos/ofertas', [FeProductosController::class, 'ofertas']);
     Route::get('productos/{id}', [FeProductosController::class, 'detail']);
     Route::get('categorias', [FeCategoriasController::class, 'index']);
     Route::get('destacados', [FeProductosController::class, 'featured']);

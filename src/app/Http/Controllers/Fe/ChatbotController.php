@@ -11,7 +11,7 @@ use App\Models\Configuracion;
 
 class ChatbotController extends Controller
 {
-    public function indexPrueba(Request $request)
+    public function index(Request $request)
     {
       
         $mensajeFijo = "¡Hola! He encontrado estas cartucheras para ti:";
@@ -23,31 +23,44 @@ class ChatbotController extends Controller
             'message' => $mensajeFijo . "\n" . $listaProductos
         ]);
     }
-    public function index(Request $request)
-    {  
-        $userMessage = $request->input('message');
+    public function indexs(Request $request)
+    {
+        $userMessage = strtolower($request->input('message'));
+
         Log::debug("User message: {$userMessage}");
+
         $config = Configuracion::where('clave', 'gemini_api_key')->first();
         $apiKey = $config ? $config->dato : null;
 
         if (!$apiKey) {
-            return response()->json(['message' => 'El asistente no está configurado.'], 500);
+            return response()->json([
+                'message' => 'El asistente no está configurado.'
+            ], 500);
+        }
+        $productos = Product::where('name', 'like', "%{$userMessage}%")
+            ->orWhere('description', 'like', "%{$userMessage}%")
+            ->where('stock', '>', 0)
+            ->limit(5)
+            ->get(['id','name','price']);
+
+        if ($productos->count() > 0) {
+
+            return response()->json([
+                "type" => "products",
+                "products" => $productos
+            ]);
+
         }
 
-        $productos = Product::all(['id','name','price','description','stock'])
-            ->toJson();
+        $prompt = "
+        Eres un asistente de ventas de una tienda escolar llamada ShopTudo.
 
-        $prompt = "Eres un asistente de ventas de ShopTudo. 
-        Usa esta información: {$productos}. 
-        El cliente pregunta: {$userMessage}. 
-        FORMATO DE RESPUESTA: 
-        1. Saluda amablemente.
-        2. Lista los productos encontrados usando estrictamente este formato:
-        - **ID**: [id_del_producto] | **Nombre**: [nombre] | **Precio**: [precio]
-        3. Usa un salto de línea entre cada producto.
-        4. No agregues texto innecesario al final.
-        Si el cliente solo saluda o hace una pregunta genérica, no listes productos. 
-        Solo responde con un saludo amable. Solo lista productos si el cliente muestra interés en comprar algo específico";
+        El cliente dijo:
+        {$userMessage}
+
+        Responde de forma amable, breve y profesional.
+        Si el cliente pregunta por productos que no existen, sugiere que revise el catálogo.
+        ";
 
         $model = "gemini-2.5-flash-lite";
 
@@ -67,13 +80,15 @@ class ChatbotController extends Controller
 
         if ($response->status() == 429) {
             return response()->json([
-                'message' => 'Se alcanzó el límite de uso del chatbot.'
+                'message' => 'El chatbot alcanzó su límite de uso.'
             ]);
         }
 
         if ($response->failed()) {
             Log::error('Error Gemini: '.$response->body());
-            return response()->json(['message' => 'Error con la IA.'], 500);
+            return response()->json([
+                'message' => 'Error con la IA.'
+            ], 500);
         }
 
         $data = $response->json();
@@ -81,6 +96,9 @@ class ChatbotController extends Controller
         $reply = $data['candidates'][0]['content']['parts'][0]['text']
             ?? 'No recibí respuesta de la IA.';
 
-        return response()->json(['message' => $reply]);
+        return response()->json([
+            "type" => "text",
+            "message" => $reply
+        ]);
     }
 }

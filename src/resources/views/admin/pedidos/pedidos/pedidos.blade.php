@@ -7,6 +7,22 @@
 @section('content')
     <div class="card shadow-sm">
         <div class="card-body">
+            <div id="contenedorFiltros" class="d-flex gap-2">
+                <div class="flex-fill">
+                    <select id="filterEstado" class="form-control form-control-sm">
+                        <option value="">Todos</option>
+                        <option value="1">Pagado</option>
+                        <option value="3">Pendiente</option>
+                        <option value="2">Rechazado</option>
+                    </select>
+                </div>
+                <div class="flex-fill">
+                    <input type="date" id="filterDesde" class="form-control form-control-sm" title="Desde">
+                </div>
+                <div class="flex-fill">
+                    <input type="date" id="filterHasta" class="form-control form-control-sm" title="Hasta">
+                </div>
+            </div>
             <table id="pedidosTable" data-url="{{ route('admin.pedidos') }}"  style="width: 100%">
                 <thead class="table-dark"> <tr>
                         <th>ID</th>
