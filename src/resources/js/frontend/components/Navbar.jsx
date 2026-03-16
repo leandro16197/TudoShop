@@ -141,11 +141,7 @@ export default function Navbar() {
                                                     <div className="quantity-selector-pill">
                                                         <button 
                                                             type="button"
-                                                            onClick={(e) => {
-                                                                e.preventDefault();
-                                                                e.stopPropagation();
-                                                                updateQuantity(item.id, item.cantidad - 1);
-                                                            }}
+                                                            onClick={(e) => { e.preventDefault();e.stopPropagation();updateQuantity(item.id, item.cantidad - 1);}}
                                                         >
                                                             -
                                                         </button>
@@ -182,11 +178,7 @@ export default function Navbar() {
                                         <strong className="total-price">${cartTotal}</strong>
                                     </div>
                                     <div className="d-flex justify-content-center">
-                                        <Link 
-                                            to="/checkout" 
-                                            className="btn btn-primary btn-realizar-pago" 
-                                            onClick={() => setCartOpen(false)}
-                                        >
+                                        <Link to="/checkout" className="btn btn-primary btn-realizar-pago" onClick={() => setCartOpen(false)}>
                                             Realizar Pago
                                         </Link>
                                     </div>
@@ -208,7 +200,9 @@ export default function Navbar() {
                         {dropdownOpen && (
                             <div className="user-dropdown-menu">
                                 <Link to="/perfil" className="dropdown-item" onClick={() => setDropdownOpen(false)}>👤 Mi Perfil</Link>
-                                <Link to="/pedidos" className="dropdown-item" onClick={() => setDropdownOpen(false)}>📦 Mis Pedidos</Link>
+                                <button className="dropdown-item" onClick={() => {setDropdownOpen(false);navigate('/perfil', { state: { tab: 'pedidos' } });}}>
+                                    📦 Mis Pedidos
+                                </button>
                                 <hr className="dropdown-divider" />
                                 <button onClick={handleLogout} className="dropdown-item logout-item">🚪 Cerrar Sesión</button>
                             </div>

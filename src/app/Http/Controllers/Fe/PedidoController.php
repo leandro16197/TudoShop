@@ -212,4 +212,45 @@ class PedidoController extends Controller
 
         return response()->json(['res' => true, 'mensaje' => '¡Pedido realizado con éxito!']);
     }
+
+    public function misPedidos()
+    {
+        $user = Auth::user();
+
+        $pedidos = Pedido::where('user_id', $user->id)
+            ->whereIn('estado', ['pendiente', 'pagado', 'rechazado'])
+            ->with(['productos.imagenes', 'envio'])
+            ->orderBy('created_at', 'desc') 
+            ->paginate(6);
+
+
+        $pedidos->getCollection()->transform(function ($pedido) {
+            $subtotal = 0;
+            $productosFormateados = $pedido->productos->map(function ($producto) use (&$subtotal) {
+                $cantidad = $producto->pivot ? $producto->pivot->cantidad : 0;
+                $precio = $producto->price;
+                $subtotal += ($precio * $cantidad);
+
+                $primeraImagen = $producto->imagenes->first();
+                return [
+                    'id'       => $producto->id,
+                    'nombre'   => $producto->name,
+                    'precio'   => $precio,
+                    'imagen'   => $primeraImagen ? asset('storage/' . $primeraImagen->imagen) : asset('images/placeholder.png'),
+                    'cantidad' => $cantidad,
+                    'total_linea' => $precio * $cantidad
+                ];
+            });
+
+            return [
+                'pedido_id'        => $pedido->id,
+                'estado'           => ucfirst($pedido->estado),
+                'total'            => round($subtotal + ($pedido->envio ? 1000 : 0), 2),
+                'productos'        => $productosFormateados,
+                'fecha_formateada' => $pedido->created_at->format('d/m/Y'),
+            ];
+        });
+
+        return response()->json($pedidos);
+    }
 }

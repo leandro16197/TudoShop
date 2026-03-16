@@ -55,7 +55,9 @@ export default function Chatbot() {
 
     return (
         <>
-            <button className="chatbot-button" onClick={() => setOpen(true)}>💬</button>
+            <button className="chatbot-button" onClick={() => setOpen(true)}>
+                <img src="/images/ShopTudoChat.png" alt="Chatbot ShopTudo" className="chatbot-icon" />
+            </button>
             {open && (
                 <div className="chatbot-overlay">
                     <div className="chatbot-modal">
@@ -65,36 +67,25 @@ export default function Chatbot() {
                         </div>
 
                         <div className="chatbot-messages">
-                            {messages.map((m, i) => {
-                                const lines = m.text.split('\n');
-                                const greeting = lines[0];
-                                const productList = lines.slice(1); 
-
-                                return (
+                            <div className="chatbot-messages">
+                                {messages.map((m, i) => (
                                     <div key={i} className={`msg ${m.type}`}>
-                                        <ReactMarkdown>{greeting}</ReactMarkdown>
-                                        <div className="custom-product-list">
-                                            {productList.map((line, idx) => {
-                                                const nombreMatch = line.match(/\*\*Nombre\*\*:\s*(.*?)(?=\s*\||$)/);
-                                                const nombre = nombreMatch ? nombreMatch[1].trim() : 'Producto';
-                                                const precioMatch = line.match(/\*\*Precio\*\*:\s*([\d.]+)/);
-                                                const precio = precioMatch ? precioMatch[1] : '0.00';
-                                                const idMatch = line.match(/\*\*ID\*\*:\s*(\d+)/);
-                                                const id = idMatch ? idMatch[1] : null;
-                                                if (!nombre) return null;
-                                                return (
+                                        {m.text && <ReactMarkdown>{m.text}</ReactMarkdown>}
+                                        {m.products && m.products.length > 0 && (
+                                            <div className="custom-product-list">
+                                                {m.products.map((p, idx) => (
                                                     <div key={idx} className="my-product-card">
-                                                        <span><strong>{nombre}</strong> - ${precio}</span>
-                                                        <button onClick={() => window.open(`/productos/${id}`, '_blank', 'noopener,noreferrer')}>
+                                                        <span><strong>{p.name}</strong>${Number(p.price).toFixed(2)}</span>
+                                                        <button onClick={() => window.open(`/productos/${p.id}`, '_blank')}>
                                                             Ver detalles
                                                         </button>
                                                     </div>
-                                                );
-                                            })}
-                                        </div>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
-                                );
-                            })}
+                                ))}
+                            </div>
                         </div>
 
                         <div className="chatbot-input">

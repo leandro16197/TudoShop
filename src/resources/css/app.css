@@ -3667,28 +3667,41 @@ body {
 }
 
 /*Chat Bot*/
-.chatbot-button{
-position:fixed;
-bottom:20px;
-right:20px;
-width:60px;
-height:60px;
-border-radius:50%;
-border:none;
-background:#f97316;
-color:white;
-font-size:24px;
-cursor:pointer;
-box-shadow:0 8px 25px rgba(249,115,22,0.35);
-z-index:9998;
-transition:all .25s ease;
+.chatbot-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: none;
+  background: #f97316;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 8px 25px rgba(249,115,22,0.35);
+  z-index: 9998;
+  transition: all .25s ease;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  overflow: hidden; 
 }
 
-.chatbot-button:hover{
-transform:scale(1.08);
-box-shadow:0 12px 30px rgba(249,115,22,0.45);
+.chatbot-icon {
+  width: 75%;          
+  height: 75%;
+  object-fit: contain; 
+  border-radius: 12px;    
+  display: block;     
 }
 
+.chatbot-button:hover {
+  transform: scale(1.08);
+  box-shadow: 0 12px 30px rgba(249,115,22,0.45);
+}
 
 .chatbot-modal{
 position:fixed;
@@ -4038,4 +4051,279 @@ background:#1e293b;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
   margin-top: 20px;
+}
+
+/* Contenedor principal */
+.pedidos-grid {
+    display: grid;
+    /* Forzamos 3 columnas exactas de igual tamaño */
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 24px;
+    margin-top: 25px;
+}
+
+/* La Tarjeta */
+.pedido-card-item {
+    background: #ffffff;
+    border: none;
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Asegura que el botón siempre esté al final */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    height: 100%; /* Para que todas las tarjetas de una fila midan lo mismo */
+}
+
+.pedido-card-item:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.pedido-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.pedido-card-header h3 {
+    font-size: 0.9rem;
+    color: #888;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.status-badge.pagado, .status-badge.Pagado { background: #e6fcf5; color: #0ca678; }
+.status-badge.pendiente, .status-badge.Pendiente { background: #fff9db; color: #f08c00; }
+.status-badge.rechazado, .status-badge.Rechazado { background: #fff5f5; color: #f03e3e; }
+
+
+.pedido-card-info {
+    margin-bottom: 20px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.info-label {
+    color: #666;
+    font-size: 0.85rem;
+}
+
+.info-value {
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.info-value.total {
+    color: #f39237;
+    font-size: 1.1rem;
+}
+
+.btn-detalle-pedido {
+    width: 100%;
+    background: #f39237;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-detalle-pedido:hover {
+    background: #e07d20;
+}
+.pedidos-header {
+    margin-bottom: 30px;
+    border-left: 5px solid #f39237; 
+    padding-left: 20px;
+}
+
+.pedidos-header h2 {
+    font-size: 2rem;
+    color: #333;
+    margin: 0;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.pedidos-header .subtitle {
+    color: #777;
+    font-size: 1rem;
+    margin-top: 5px;
+}
+
+@media (max-width: 1024px) {
+    .pedidos-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+
+@media (max-width: 650px) {
+    .pedidos-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .pedido-card-item {
+        padding: 20px;
+    }
+}
+
+.pedidos-header {
+    margin-bottom: 40px;
+    text-align: left;
+}
+
+.pedidos-header h2 {
+    font-size: 2.2rem;
+    color: #2d3436;
+    margin-bottom: 8px;
+    font-weight: 800;
+}
+
+.header-line {
+    width: 60px;
+    height: 4px;
+    background: #f39237;
+    border-radius: 2px;
+    margin-bottom: 12px;
+}
+
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-top: 40px;
+    padding: 20px 0;
+}
+
+.btn-pagination {
+    background: #fff;
+    border: 2px solid #f39237;
+    color: #f39237;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-pagination:hover:not(:disabled) {
+    background: #f39237;
+    color: #fff;
+}
+
+.btn-pagination:disabled {
+    border-color: #eee;
+    color: #ccc;
+    cursor: not-allowed;
+}
+
+.page-info {
+    font-size: 0.95rem;
+    color: #666;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-card {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #f4f4f4;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    font-size: 1.2rem;
+    color: #555;
+    transition: background 0.2s;
+}
+
+.close-modal:hover {
+    background: #e0e0e0;
+}
+
+.tabla-productos {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.tabla-productos th {
+    color: #888;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    padding: 10px 5px;
+    border-bottom: 1px solid #eee;
+}
+
+.tabla-productos td {
+    padding: 12px 5px;
+    border-bottom: 1px solid #f9f9f9;
+}
+.modal-title {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #2d3436;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+}
+.modal-header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f0f0f0;
 }

@@ -29,6 +29,7 @@ Route::prefix('frontend/v1')->group(function () {
         Route::put('perfil/actualizar/email', [FeClientesController::class, 'actualizarEmail']);
         Route::post('pedidos/guardar-envio', [EnvioController::class, 'guardarEnvio']);
         Route::post('pago', [PagosController::class, 'pagar']);
+        Route::get('mis-pedidos', [PedidoController::class, 'misPedidos']);
     });
     
     Route::get('productos', [FeProductosController::class, 'search']);

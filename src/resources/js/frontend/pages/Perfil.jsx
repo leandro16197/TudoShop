@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import MisPedidos from '../components/MisPedidos';
+import { useLocation } from 'react-router-dom';
 
 export default function Perfil() {
+    const location = useLocation(); 
     const [user, setUser] = useState({
         nombre: '',
         apellido: '',
@@ -10,15 +13,20 @@ export default function Perfil() {
     });
     const [loading, setLoading] = useState(true);
 
+    const [tabActual, setTabActual] = useState(location.state?.tab || 'perfil');
+    useEffect(() => {
+        if (location.state?.tab) {
+            setTabActual(location.state.tab);
+        }
+    }, [location]);
+
     useEffect(() => {
         const fetchUserData = async () => {
             const token = sessionStorage.getItem("token");
-            
             if (!token) {
                 setLoading(false);
                 return;
             }
-
             try {
                 const response = await fetch('api/frontend/v1/perfil', {
                     headers: {
@@ -27,13 +35,12 @@ export default function Perfil() {
                     }
                 });
                 const data = await response.json();
-                
                 if (response.ok) {
-                    setUser({
-                        nombre: data.nombre || '',
-                        apellido: data.apellido || '',
-                        email: data.email || '',
-                        password: '',
+                    setUser({ 
+                        nombre: data.nombre || '', 
+                        apellido: data.apellido || '', 
+                        email: data.email || '', 
+                        password: '', 
                         password_confirmation: '' 
                     });
                 }
@@ -52,14 +59,11 @@ export default function Perfil() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
         if (user.password && user.password !== user.password_confirmation) {
             alert("Las contraseñas no coinciden.");
             return;
         }
-
         const token = sessionStorage.getItem("token");
-        
         try {
             const response = await fetch('api/frontend/v1/perfil/actualizar', {
                 method: 'PUT',
@@ -70,14 +74,10 @@ export default function Perfil() {
                 },
                 body: JSON.stringify(user)
             });
-
             if (response.ok) {
                 const clienteStorage = JSON.parse(sessionStorage.getItem("cliente"));
                 sessionStorage.setItem("cliente", JSON.stringify({ ...clienteStorage, nombre: user.nombre }));
-                
-
                 window.dispatchEvent(new Event("authChange"));
-                
                 alert("Perfil actualizado correctamente");
                 setUser(prev => ({ ...prev, password: '', password_confirmation: '' }));
             }
@@ -111,60 +111,57 @@ export default function Perfil() {
                     </div>
                     <div className="filter-separator"></div>
                     <nav className="sidebar-nav">
-                        <button className="nav-item active">👤 Perfil</button>
-                        <button className="nav-item">📦 Mis Pedidos</button>
+                        <button 
+                            className={`nav-item ${tabActual === 'perfil' ? 'active' : ''}`}
+                            onClick={() => setTabActual('perfil')}
+                        >
+                            👤 Perfil
+                        </button>
+                        <button 
+                            className={`nav-item ${tabActual === 'pedidos' ? 'active' : ''}`}
+                            onClick={() => setTabActual('pedidos')}
+                        >
+                            📦 Mis Pedidos
+                        </button>
                     </nav>
                 </div>
             </aside>
-
             <main className="perfil-content">
-                <div className="form-card">
-                    <h2>Configuración de la Cuenta</h2>
-                    <p className="subtitle">Gestione sus datos personales y seguridad</p>
-                    
-                    <form onSubmit={handleSubmit} className="perfil-form">
-                        <div className="form-row">
-                            <div className="form-group">
-                                <label>Nombre</label>
-                                <input type="text" name="nombre" value={user.nombre} onChange={handleChange} required />
+                {tabActual === 'perfil' ? (
+                    <div className="form-card">
+                        <h2>Configuración de la Cuenta</h2>
+                        <p className="subtitle">Gestione sus datos personales y seguridad</p>
+                        <form onSubmit={handleSubmit} className="perfil-form">
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label>Nombre</label>
+                                    <input type="text" name="nombre" value={user.nombre} onChange={handleChange} required />
+                                </div>
+                                <div className="form-group">
+                                    <label>Apellido</label>
+                                    <input type="text" name="apellido" value={user.apellido} onChange={handleChange} required />
+                                </div>
                             </div>
                             <div className="form-group">
-                                <label>Apellido</label>
-                                <input type="text" name="apellido" value={user.apellido} onChange={handleChange} required />
+                                <label>Email (No editable)</label>
+                                <input type="email" value={user.email} disabled className="input-disabled" />
                             </div>
-                        </div>
-
-                        <div className="form-group">
-                            <label>Email (No editable)</label>
-                            <input type="email" value={user.email} disabled className="input-disabled" />
-                        </div>
-
-                        <div className="form-row">
-                            <div className="form-group">
-                                <label>Nueva Contraseña</label>
-                                <input 
-                                    type="password" 
-                                    name="password" 
-                                    placeholder="Dejar en blanco para no cambiar" 
-                                    value={user.password} 
-                                    onChange={handleChange} 
-                                />
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label>Nueva Contraseña</label>
+                                    <input type="password" name="password" placeholder="Dejar en blanco para no cambiar" value={user.password} onChange={handleChange} />
+                                </div>
+                                <div className="form-group">
+                                    <label>Confirmar Contraseña</label>
+                                    <input type="password" name="password_confirmation" placeholder="Repite la nueva contraseña" value={user.password_confirmation} onChange={handleChange} />
+                                </div>
                             </div>
-                            <div className="form-group">
-                                <label>Confirmar Contraseña</label>
-                                <input 
-                                    type="password" 
-                                    name="password_confirmation" 
-                                    placeholder="Repite la nueva contraseña" 
-                                    value={user.password_confirmation} 
-                                    onChange={handleChange} 
-                                />
-                            </div>
-                        </div>
-
-                        <button type="submit" className="btn-save">ACTUALIZAR DATOS</button>
-                    </form>
-                </div>
+                            <button type="submit" className="btn-save">ACTUALIZAR DATOS</button>
+                        </form>
+                    </div>
+                ) : (
+                    <MisPedidos />
+                )}
             </main>
         </div>
     );
