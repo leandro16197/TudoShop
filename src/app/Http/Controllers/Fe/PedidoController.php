@@ -52,16 +52,22 @@ class PedidoController extends Controller
             'pedido_id' => $pedido->id
         ]);
     }
-
-    public function obtenerCarrito()
+    public function obtenerCarrito($id = null)
     {
         $user = \Auth::user();
 
+        if ($id) {
 
-        $pedido = Pedido::where('user_id', $user->id)
-            ->where('estado', 'pendiente')
-            ->with(['productos.imagenes', 'envio']) 
-            ->first();
+            $pedido = Pedido::where('id', $id)
+                ->where('user_id', $user->id)
+                ->with(['productos.imagenes', 'envio'])
+                ->first();
+        } else {
+            $pedido = Pedido::where('user_id', $user->id)
+                ->where('estado', 'pendiente')
+                ->with(['productos.imagenes', 'envio'])
+                ->first();
+        }
 
         if (!$pedido) {
             return response()->json([
@@ -69,13 +75,15 @@ class PedidoController extends Controller
                 'subtotal' => 0,
                 'costo_envio' => 0,
                 'total' => 0,
-                'usuario' => ['email' => $user->email]
-            ]);
+                'usuario' => [
+                    'email' => $user->email,
+                    'nombre' => $user->name
+                ]
+            ], 404); 
         }
 
         $subtotal = 0;
 
-    
         $productosFormateados = $pedido->productos->map(function ($producto) use (&$subtotal) {
             $cantidad = $producto->pivot ? $producto->pivot->cantidad : 0;
             $precio = $producto->price;
@@ -96,17 +104,14 @@ class PedidoController extends Controller
             ];
         });
 
-
         $costoEnvio = 0;
         $datosEnvioGuardados = $pedido->envio;
 
         if ($datosEnvioGuardados) {
-        
             $config = \DB::table('configuracions')->select('dato')->where('clave', 'codigo_postal')->first();
             $cpTienda = $config ? $config->dato : null;
 
             if ($cpTienda && $datosEnvioGuardados->cp !== $cpTienda) {
-
                 $costoEnvio = 1000 + ($subtotal * 0.10);
             } else {
                 $costoEnvio = 1000;
@@ -120,6 +125,7 @@ class PedidoController extends Controller
             ],
             'productos'   => $productosFormateados,
             'pedido_id'   => $pedido->id,
+            'estado'      => $pedido->estado, 
             'subtotal'    => round($subtotal, 2),
             'costo_envio' => round($costoEnvio, 2),
             'total'       => round($subtotal + $costoEnvio, 2),

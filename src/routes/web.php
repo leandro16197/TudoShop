@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\ClienteController;
 use App\Http\Controllers\Admin\ConfiguracionController;
 use App\Http\Controllers\Admin\PedidosController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\FinanzasController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,8 @@ Route::get('/panel/marcas', [MarcaController::class,'index'])->name('admin.marca
 Route::get('/panel/clientes', [ClienteController::class, 'index'])->name('admin.clientes');
 Route::get('/panel/configuracion', [ConfiguracionController::class, 'index'])->name('admin.configuracion.general');
 Route::get('/panel/pedidos', [PedidosController::class, 'index'])->name('admin.pedidos');
+Route::get('/panel/finanzas', [FinanzasController::class, 'index'])->name('admin.finanzas.index');
+
 
 Route::middleware(['auth', 'verified'])
     ->prefix('frontend/v2')
@@ -57,6 +60,8 @@ Route::middleware(['auth', 'verified'])
         Route::get('/panel/ventas-mes', [DashboardController::class, 'ventasMes']);
         Route::get('/ofertas/relaciones', [OfertaController::class, 'relaciones'])->name('admin.ofertas.relaciones');
         Route::get('/pedidos/check-progress', [PedidosController::class, 'checkProgress']);
+        Route::get('/cards-stats', [FinanzasController::class, 'getCardStats'])->name('admin.finanzas.cards');
+        Route::get('/grafica-evolucion', [FinanzasController::class, 'getGraficaEvolucion'])->name('admin.finanzas.grafica');
 
 });
 Route::view('/{any}', 'frontend.home')

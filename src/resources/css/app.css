@@ -4327,3 +4327,90 @@ background:#1e293b;
     padding-bottom: 15px;
     border-bottom: 2px solid #f0f0f0;
 }
+.app-toast {
+    position: fixed;
+    top: 20px;
+    right: 20px; 
+    z-index: 9999;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: sans-serif;
+    font-weight: 500;
+
+    animation: toastSlideInRight 0.4s ease-out forwards;
+}
+
+.app-toast.success {
+    background-color: #28a745;
+}
+
+.app-toast.error {
+    background-color: #dc3545;
+}
+
+
+@keyframes toastSlideInRight {
+    from {
+        transform: translateX(110%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.app-toast-fade-out {
+    animation: toastSlideOutRight 0.4s ease-in forwards;
+}
+
+@keyframes toastSlideOutRight {
+    from { 
+        transform: translateX(0); 
+        opacity: 1; 
+    }
+    to { 
+        transform: translateX(110%); 
+        opacity: 0; 
+    }
+}
+
+.btn-checkout {
+    width: 100%;
+    padding: 15px;
+    border-radius: 10px;
+    border: none;
+    font-weight: bold;
+    font-size: 16px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    color: white;
+}
+
+
+.btn-checkout.enabled {
+    background-color: #FF8C00; 
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 140, 0, 0.3);
+}
+
+.btn-checkout.enabled:hover {
+    background-color: #e67e00;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 140, 0, 0.4);
+}
+
+.btn-checkout.enabled:active {
+    transform: translateY(0);
+}
+
+.btn-checkout.disabled {
+    background-color: #ced4da;
+    cursor: not-allowed;
+    box-shadow: none;
+}

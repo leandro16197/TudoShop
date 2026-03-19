@@ -160,6 +160,32 @@
                     </ul>
                 </div>
             </li>
+            <li class="nav-item">
+                <a class="nav-link d-flex justify-content-between align-items-center {{ request()->routeIs('admin.finanzas.*') ? 'active' : '' }}"
+                data-bs-toggle="collapse"
+                href="#finanzasSubmenu"
+                role="button"
+                aria-expanded="{{ request()->routeIs('admin.finanzas.*') ? 'true' : 'false' }}"
+                aria-controls="finanzasSubmenu">
+                    <span>
+                        <i class="bi bi-wallet2 me-2"></i> Finanzas
+                    </span>
+                    <i class="bi bi-chevron-down toggle-icon"></i>
+                </a>
+
+                <div class="collapse {{ request()->routeIs('admin.finanzas.*') ? 'show' : '' }}"
+                    id="finanzasSubmenu"
+                    style="margin-left:20px; margin-top:5px;">
+                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                        <li>
+                            <a href="{{ route('admin.finanzas.index') }}"
+                            class="nav-link ps-4 {{ request()->routeIs('admin.finanzas.index') ? 'active' : '' }}">
+                                <i class="bi bi-graph-up-arrow me-2"></i> Pagos y Reportes
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
         </ul>
 
     </ul>

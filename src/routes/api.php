@@ -20,7 +20,7 @@ Route::prefix('frontend/v1')->group(function () {
         Route::get('/perfil', [AuthClienteController::class, 'me']);
         Route::post('/logout', [AuthClienteController::class, 'logout']);
         Route::put('perfil/actualizar', [FeClientesController::class, 'actualizar']);
-        Route::get('/pedidos/mi-carrito', [PedidoController::class, 'obtenerCarrito']);
+        Route::get('/pedidos/mi-carrito/{id?}', [PedidoController::class, 'obtenerCarrito']);
         Route::post('actualizar-cantidad', [PedidoController::class, 'actualizarCantidad']);
         Route::delete('/eliminar-producto/{productoId}', [PedidoController::class, 'eliminarProducto']);
         Route::post('/pedidos/agregar-producto', [PedidoController::class, 'agregarProducto']);

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
 const PaginaCompra = () => {
     const [cargando, setCargando] = useState(true);
+    const { id } = useParams();
     const [cart, setCart] = useState([]);
     const [tipoEnvio, setTipoEnvio] = useState('domicilio');
     const [usuario, setUsuario] = useState({ nombre: '', email: '' });
@@ -10,6 +12,7 @@ const PaginaCompra = () => {
     const [editandoContacto, setEditandoContacto] = useState(false);
     const [envioConfirmado, setEnvioConfirmado] = useState(false);
     const [pedidoId, setPedidoId] = useState(1);
+    const [mensajeEnvio, setMensajeEnvio] = useState({ texto: '', tipo: '' });
     const [datosEnvio, setDatosEnvio] = useState({
         cp: '',
         localidad: '',
@@ -18,10 +21,18 @@ const PaginaCompra = () => {
         telefono: ''
     });
 
-    const fetchCart = async () => {
+    const fetchCart = async (idPedidoForzado = null) => {
+        if (idPedidoForzado === 'success' || idPedidoForzado === 'error') return;
+
         const token = sessionStorage.getItem("token");
+        if (!token) return;
+
         try {
-            const res = await axios.get('/api/frontend/v1/pedidos/mi-carrito', {
+            const url = idPedidoForzado 
+                ? `/api/frontend/v1/pedidos/mi-carrito/${idPedidoForzado}` 
+                : '/api/frontend/v1/pedidos/mi-carrito';
+
+            const res = await axios.get(url, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
@@ -30,18 +41,25 @@ const PaginaCompra = () => {
                     setCart(res.data.productos);
                     setPedidoId(res.data.pedido_id);
                 }
+
                 if (res.data.datos_envio) {
+                    const { cp, localidad, direccion, nombre_destinatario, telefono } = res.data.datos_envio;
                     setDatosEnvio({
-                        cp: res.data.datos_envio.cp || '',
-                        localidad: res.data.datos_envio.localidad || '',
-                        direccion: res.data.datos_envio.direccion || '',
-                        nombre_destinatario: res.data.datos_envio.nombre_destinatario || '',
-                        telefono: res.data.datos_envio.telefono || ''
+                        cp: cp || '',
+                        localidad: localidad || '',
+                        direccion: direccion || '',
+                        nombre_destinatario: nombre_destinatario || '',
+                        telefono: telefono || ''
                     });
+
+                    if (direccion && localidad) {
+                        setEnvioConfirmado(true);
+                    }
                 }
+                
                 setMontos({
                     subtotal: parseFloat(res.data.subtotal) || 0,
-                    costo_envio: parseFloat(res.data.costo_envio) || 0, 
+                    costo_envio: parseFloat(res.data.costo_envio) || 0,
                     total: parseFloat(res.data.total) || 0
                 });
             }
@@ -50,17 +68,30 @@ const PaginaCompra = () => {
         }
     };
 
+
     useEffect(() => {
+        if (id === 'success' || id === 'error') {
+            setCargando(false);
+            return;
+        }
+
         const cargarDatosIniciales = async () => {
             const token = sessionStorage.getItem("token");
-            if (!token) { setCargando(false); return; }
+            if (!token) { 
+                setCargando(false); 
+                return; 
+            }
             try {
                 const headers = { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' };
                 const [resUser] = await Promise.all([
                     axios.get('/api/frontend/v1/perfil', { headers }),
-                    fetchCart()
+                    fetchCart(id) 
                 ]);
-                setUsuario({ nombre: resUser.data.nombre || 'Usuario', email: resUser.data.email || '' });
+                
+                setUsuario({ 
+                    nombre: resUser.data.nombre || 'Usuario', 
+                    email: resUser.data.email || '' 
+                });
             } catch (error) {
                 console.error("Error inicial", error);
             } finally {
@@ -68,26 +99,23 @@ const PaginaCompra = () => {
             }
         };
         cargarDatosIniciales();
-    }, []);
+    }, [id]);
 
     const updateQuantity = async (productoId, nuevaCantidad) => {
         if (nuevaCantidad < 1) return;
+
         setCart(prev => prev.map(item => item.id === productoId ? { ...item, cantidad: nuevaCantidad } : item));
+        
         try {
             const token = sessionStorage.getItem("token");
-            const response = await fetch("/api/frontend/v1/actualizar-cantidad", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`,
-                    "Accept": "application/json"
-                },
-                body: JSON.stringify({ producto_id: productoId, cantidad: nuevaCantidad })
-            });
-            await fetchCart();
+            await axios.post("/api/frontend/v1/actualizar-cantidad", 
+                { producto_id: productoId, cantidad: nuevaCantidad, pedido_id: pedidoId },
+                { headers: { "Authorization": `Bearer ${token}`, "Accept": "application/json" } }
+            );
+            await fetchCart(id); 
         } catch (error) {
             console.error("Error al actualizar:", error);
-            await fetchCart();
+            await fetchCart(id);
         }
     };
 
@@ -95,54 +123,16 @@ const PaginaCompra = () => {
         const token = sessionStorage.getItem("token");
         if (!token) return;
         try {
-            const response = await fetch(`/api/frontend/v1/eliminar-producto/${productoId}`, {
-                method: "DELETE",
-                headers: { "Authorization": `Bearer ${token}` }
+            await axios.delete(`/api/frontend/v1/eliminar-producto/${productoId}`, {
+                headers: { "Authorization": `Bearer ${token}` },
+                data: { pedido_id: pedidoId }
             });
-            if (response.ok) await fetchCart();
+            await fetchCart(id);
         } catch (error) {
             console.error("Error al eliminar:", error);
         }
     };
 
-    const guardarEmailPedido = async () => {
-        const token = sessionStorage.getItem("token");
-        if (!token || !pedidoId) return;
-
-        try {
-            const response = await axios.put('/api/frontend/v1/perfil/actualizar/email',
-                {
-                    pedido_id: pedidoId,
-                    email: usuario.email
-                },
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Accept': 'application/json'
-                    }
-                }
-            );
-
-            if (response.data.status === 'success') {
-                const nuevoEmail = response.data.pedido ? response.data.pedido.email : response.data.usuario.email;
-
-                setUsuario(prev => ({
-                    ...prev,
-                    email: nuevoEmail
-                }));
-                setEditandoContacto(false);
-            }
-        } catch (error) {
-            console.error("Error al actualizar:", error);
-        }
-    };
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setDatosEnvio(prev => ({
-            ...prev,
-            [name]: value
-        }));
-    };
     const guardarDatosEnvio = async () => {
         const token = sessionStorage.getItem("token");
         if (!pedidoId) return;
@@ -156,15 +146,26 @@ const PaginaCompra = () => {
             });
 
             if (res.data.status === 'success') {
-                await fetchCart();
+                await fetchCart(id);
                 setEnvioConfirmado(true);
+                mostrarNotificacion('¡Datos de envío guardados!', 'ok');
             }
         } catch (error) {
-            console.error("Error al guardar envío", error);
-            setEnvioConfirmado(false); 
+            mostrarNotificacion('Error al guardar datos', 'nok');
         }
     };
-    
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setDatosEnvio(prev => ({
+            ...prev,
+            [name]: value
+        }));
+        
+        if (name === 'direccion' || name === 'localidad' || name === 'cp') {
+            setEnvioConfirmado(false);
+        }
+    };
     const handlePago = async () => {
         const token = sessionStorage.getItem("token");
         if (!token || !pedidoId) return;
@@ -180,8 +181,13 @@ const PaginaCompra = () => {
             }
         } catch (error) {
             console.error("Error en la pasarela de pago:", error);
-            
         }
+    };
+    const mostrarNotificacion = (texto, tipo = 'ok') => {
+        setMensajeEnvio({ texto, tipo });
+        setTimeout(() => {
+            setMensajeEnvio({ texto: '', tipo: '' });
+        }, 5000);
     };
     if (cargando) {
         return (
@@ -225,8 +231,6 @@ const PaginaCompra = () => {
 
             <div className="main-checkout-wrapper">
                 <div className="steps-container">
-
-                    {/* PASO 1: REVISÁ TU PEDIDO */}
                     <div className="step-panel active" style={{ border: '1px solid #003366', borderRadius: '12px', overflow: 'hidden', backgroundColor: '#fff', marginBottom: '20px' }}>
                         <div className="step-header" style={{ backgroundColor: '#f8f9fa', padding: '15px 20px', borderBottom: '1px solid #eee', display: 'flex', alignItems: 'center' }}>
                             <div className="step-number" style={{ backgroundColor: '#003366', color: 'white', borderRadius: '50%', width: '25px', height: '25px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '10px', fontSize: '14px', fontWeight: 'bold' }}>1</div>
@@ -292,8 +296,6 @@ const PaginaCompra = () => {
                             )}
                         </div>
                     </div>
-
-                    {/* PASO 2: DATOS DE CONTACTO */}
                     <div className="step-panel" style={{ border: '1px solid #e0e0e0', borderRadius: '12px', backgroundColor: '#fff', marginBottom: '20px' }}>
                         <div className="step-header" style={{ padding: '15px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #f0f0f0' }}>
                             <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -330,7 +332,6 @@ const PaginaCompra = () => {
                         </div>
                     </div>
 
-                    {/* PASO 3: ENVÍO */}
                     <div className="step-panel" style={{ border: '1px solid #e0e0e0', borderRadius: '12px', backgroundColor: '#fff', marginBottom: '20px' }}>
                         <div className="step-header" style={{ padding: '15px 20px', display: 'flex', alignItems: 'center', borderBottom: '1px solid #f0f0f0' }}>
                             <div style={{ backgroundColor: '#003366', color: 'white', borderRadius: '50%', width: '25px', height: '25px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '10px', fontSize: '14px', fontWeight: 'bold' }}>3</div>
@@ -365,8 +366,14 @@ const PaginaCompra = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* RESUMEN */}
+                {mensajeEnvio.texto && (
+                    <div className={`app-toast ${mensajeEnvio.tipo === 'ok' ? 'success' : 'error'}`}>
+                        <span style={{ fontSize: '18px' }}>
+                            {mensajeEnvio.tipo === 'ok' ? '✓' : '✕'}
+                        </span>
+                        <span>{mensajeEnvio.texto}</span>
+                    </div>
+                )}        
                 <div className="summary-container">
                     <div className="summary-card">
                         <div className="summary-header" style={{ backgroundColor: '#003366', color: 'white', padding: '15px', fontWeight: 'bold', textAlign: 'center', borderRadius: '12px 12px 0 0' }}>
@@ -374,8 +381,7 @@ const PaginaCompra = () => {
                         </div>
                         
                         <div className="summary-body" style={{ padding: '20px', backgroundColor: 'white', borderRadius: '0 0 12px 12px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-                            
-                            {/* Subtotal */}
+                        
                             <div className="d-flex justify-content-between mb-2">
                                 <span style={{ color: '#555' }}>Subtotal:</span>
                                 <span className="fw-bold"> 
@@ -383,11 +389,10 @@ const PaginaCompra = () => {
                                 </span>
                             </div>
 
-                            {/* Envío */}
                             <div className="d-flex justify-content-between mb-2">
                                 <span style={{ color: '#555' }}>Envío:</span>
                                 {(!montos.costo_envio || montos.costo_envio === 0) ? (
-                                    <span className="text-success fw-bold">¡Gratis!</span>
+                                    <span className="text-success fw-bold">Calculando costo ....</span>
                                 ) : (
                                     <span className="fw-bold"> 
                                         ${Number(montos.costo_envio).toLocaleString('es-AR')}
@@ -403,24 +408,18 @@ const PaginaCompra = () => {
                                     ${Number(montos?.total || 0).toLocaleString('es-AR')}
                                 </span>
                             </div>
-
+    
                             <button 
-                                className="btn-checkout"
-                                disabled={!envioConfirmado}
-                                style={{ width: '100%', padding: '15px', borderRadius: '10px', border: 'none', fontWeight: 'bold', fontSize: '16px', textTransform: 'uppercase', transition: 'all 0.3s ease',
-                                    backgroundColor: (!datosEnvio.cp || !datosEnvio.direccion) ? '#ced4da' : '#FF8C00',
-                                    color: 'white',
-                                    cursor: (!datosEnvio.cp || !datosEnvio.direccion) ? 'not-allowed' : 'pointer',
-                                    boxShadow: (!datosEnvio.cp || !datosEnvio.direccion) ? 'none' : '0 4px 15px rgba(255, 140, 0, 0.3)'
-                                }}
-                               onClick={handlePago}
+                                className={`btn-checkout ${envioConfirmado ? 'enabled' : 'disabled'}`} 
+                                disabled={!envioConfirmado} 
+                                onClick={handlePago}
                             >
-                                {(!datosEnvio.cp || !datosEnvio.direccion) ? 'Faltan datos de envío' : 'IR AL PAGO'}
+                                {envioConfirmado ? 'IR AL PAGO' : 'CONFIRMAR ENVÍO PARA PAGAR'}
                             </button>
-                            {(!datosEnvio.cp || !datosEnvio.direccion) && (
+                            {!envioConfirmado && (
                                 <div style={{ marginTop: '12px', fontSize: '12px', color: '#dc3545', textAlign: 'center', fontWeight: '500' }}>
                                     <i className="bi bi-info-circle me-1"></i>
-                                    Debe confirmar su domicilio para habilitar el pago.
+                                    Haz clic en "Confirmar datos de envío" arriba para continuar.
                                 </div>
                             )}
                         </div>

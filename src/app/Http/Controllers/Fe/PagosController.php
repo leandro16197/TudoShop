@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Fe;
 
 use App\Http\Controllers\Controller;
+use App\Mail\PedidoAprobadoMail;
+use App\Mail\PedidoRechazadoMail;
 use App\Models\Pagos;
 use App\Models\Pedido;
 use Illuminate\Http\Request;
@@ -82,6 +84,7 @@ class PagosController extends Controller
                     "failure" => url('/checkout/error'),
                     "pending" => url('/checkout/error')
                 ],
+                "notification_url" => url('/api/frontend/v1/mp/webhook'),
                 "auto_return" => "approved",
                 "external_reference" => (string) $pedido->id,
                 "binary_mode" => true,
@@ -128,17 +131,12 @@ class PagosController extends Controller
 
     public function webhook(Request $request)
     {
-        \Log::debug("entro al webhook");
+        \Log::debug("Webhook recibido", $request->all());
 
         $token = DB::table('configuracions')->where('clave', 'mp_access_token')->value('dato');
-
-        if (!$token) {
-
-            return response()->json(['error' => 'Configuración no encontrada'], 500);
-        }
+        if (!$token) return response()->json(['error' => 'Config'], 500);
 
         MercadoPagoConfig::setAccessToken($token);
-
         $type = $request->input('type') ?? $request->input('topic');
         $paymentId = $request->input('data.id') ?? $request->input('id');
 
@@ -146,92 +144,64 @@ class PagosController extends Controller
             try {
                 $client = new PaymentClient();
                 $payment = $client->get($paymentId);
-                $pedidoId = $payment->external_reference;
+                $externalRef = $payment->external_reference;
 
+                if (!$externalRef) return response()->json(['status' => 'no_ref'], 200);
 
+                $pedido = Pedido::with('user')->find($externalRef);
+                if (!$pedido) return response()->json(['status' => 'no_pedido'], 200);
 
-                if ($type === 'payment' && $paymentId) {
-                    $payment = $client->get($paymentId);
-                    if ($payment->status === 'approved') {
-                        $this->procesarPagoAprobado($payment->external_reference, $paymentId);
-                    }
+                if ($payment->status === 'approved') {
+                    $this->procesarPagoAprobado($externalRef, $paymentId, $payment->transaction_amount);
+                    
+                    \Mail::to($pedido->user->email)->queue(new PedidoAprobadoMail($pedido));
+                    \Log::info("Pago Aprobado: Mail enviado pedido #{$pedido->id}");
+                } 
+                
+                elseif (in_array($payment->status, ['rejected', 'cancelled', 'refunded', 'charged_back'])) {
+                    \Mail::to($pedido->user->email)->queue(new PedidoRechazadoMail($pedido));
+                    \Log::warning("Pago Rechazado ({$payment->status}): Mail enviado pedido #{$pedido->id}");
                 }
+
             } catch (\Exception $e) {
-                return response()->json(['error_handled' => $e->getMessage()], 200);
+                \Log::error("Error en Webhook/Mail: " . $e->getMessage());
+                return response()->json(['status' => 'error_handled'], 200);
             }
         }
 
         return response()->json(['status' => 'received'], 200);
     }
-
-    public function confirmarPagoManual(Request $request)
+    
+    private function procesarPagoAprobado($pedidoId, $paymentId, $totalMp)
     {
-        /*if ($request->status !== 'approved') {
-            return response()->json(['message' => 'El pago no está aprobado'], 400);
-        }
+        return DB::transaction(function () use ($pedidoId, $paymentId, $totalMp) {
 
-        try {
-            return DB::transaction(function () use ($request) {
-                $pedido = Pedido::with(['productos.marcas', 'productos.categorias']) 
-                    ->where('id', $request->pedido_id)
-                    ->where('estado', 'pendiente')
-                    ->lockForUpdate()
-                    ->first();
-
-                if (!$pedido) {
-                    return response()->json(['message' => 'Pedido no encontrado o ya procesado'], 200);
-                }
-
-                $totalCalculado = 0;
-
-                foreach ($pedido->productos as $producto) {
-                    $cantidad = (int) $producto->pivot->cantidad;
-                    $precioFinal = $this->calcularPrecioFinal($producto, $cantidad);
-                    $totalCalculado += ($cantidad * $precioFinal);
-                    DB::table('productos')
-                        ->where('id', $producto->id)
-                        ->decrement('stock', $cantidad);
-                }
-                Pagos::create([
-                    'pedido_id'          => $pedido->id,
-                    'user_id'            => $pedido->user_id,
-                    'total'              => (float) $totalCalculado,
-                    'numero_transaccion' => $request->payment_id,
-                ]);
-
-                $pedido->update(['estado' => 'pagado']);
-
-                return response()->json(['message' => 'Pago registrado y stock actualizado']);
-            });
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Error interno', 'error' => $e->getMessage()], 500);
-        }*/
-    }
-
-    private function procesarPagoAprobado($pedidoId, $paymentId) {
-        return DB::transaction(function () use ($pedidoId, $paymentId) {
-            $pedido = Pedido::with('productos')->where('id', $pedidoId)->where('estado', 'pendiente')->lockForUpdate()->first();
+            $pedido = Pedido::with(['productos', 'cliente', 'pago'])
+                ->where('id', $pedidoId)
+                ->where('estado', 'pendiente')
+                ->lockForUpdate()
+                ->first();
 
             if (!$pedido) return false;
 
-            $total = 0;
             foreach ($pedido->productos as $producto) {
                 $cantidad = (int) $producto->pivot->cantidad;
-                $precioFinal = $this->calcularPrecioFinal($producto, $cantidad);
-                $total += ($cantidad * $precioFinal);
-                
-                DB::table('productos')->where('id', $producto->id)->decrement('stock', $cantidad);
+
+                DB::table('productos')
+                    ->where('id', $producto->id)
+                    ->decrement('stock', $cantidad);
             }
 
             Pagos::create([
                 'pedido_id' => $pedido->id,
                 'user_id' => $pedido->user_id,
-                'total' => (float) $total,
+                'total' => (float) $totalMp, 
                 'numero_transaccion' => $paymentId,
             ]);
 
             $pedido->update(['estado' => 'pagado']);
-            return true;
+
+            return $pedido->fresh(['cliente', 'pago', 'productos']);
         });
     }
 }

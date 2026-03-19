@@ -45,6 +45,7 @@ export default function App() {
               <Route path="/checkout" element={<PaginaCompra />} />
               <Route path="/checkout/success" element={<SuccessPage />} />
               <Route path="/checkout/error" element={<ErrorPage />} />
+              <Route path="/checkout/:id" element={<PaginaCompra />} />
             </Routes>
           </main>
           <Chatbot/>
