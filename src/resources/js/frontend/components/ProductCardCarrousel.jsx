@@ -1,17 +1,59 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function FeaturedProductCard({ product }) {
-  const { id, nombre, precio, imagen, stock } = product;
+  const { id, nombre, precio, imagen, stock, is_favorite } = product;
+  const [isFav, setIsFav] = useState(!!is_favorite);
+  const navigate = useNavigate();
 
   const formattedPrice = new Intl.NumberFormat('es-AR', {
     style: 'currency',
     currency: 'ARS',
   }).format(precio);
 
+  const handleFavoriteClick = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/frontend/v1/favorito/${id}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        setIsFav(!isFav);
+      }
+    } catch (error) {
+      console.error("Error al actualizar favorito:", error);
+    }
+  };
+  useEffect(() => {
+    setIsFav(!!is_favorite);
+  }, [is_favorite]);
+
   return (
     <Link to={`/productos/${id}`} className="featured-card">
       <div className="featured-card__image-wrapper">
+        
+        <button 
+          className="fav-btn fav-btn--small"
+          onClick={handleFavoriteClick}
+          title={isFav ? "Quitar de favoritos" : "Agregar a favoritos"}
+        >
+          <i className={`bi ${isFav ? 'bi-star-fill' : 'bi-star'} fav-icon`}></i>
+        </button>
+
         {imagen ? (
           <img
             src={imagen}
@@ -23,6 +65,7 @@ export default function FeaturedProductCard({ product }) {
           <div className="featured-card__no-image">Sin imagen</div>
         )}
       </div>
+
       <div className="featured-card__content">
         <h4 className="featured-card__title">{nombre}</h4>
         <div className="featured-card__footer">

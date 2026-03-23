@@ -7,6 +7,7 @@ use App\Http\Controllers\Fe\FeClientesController;
 use App\Http\Controllers\Fe\AuthClienteController;
 use App\Http\Controllers\Fe\ChatbotController;
 use App\Http\Controllers\FE\EnvioController;
+use App\Http\Controllers\Fe\FavoritoController;
 use App\Http\Controllers\Fe\PedidoController;
 use App\Http\Controllers\Fe\PagosController;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +31,8 @@ Route::prefix('frontend/v1')->group(function () {
         Route::post('pedidos/guardar-envio', [EnvioController::class, 'guardarEnvio']);
         Route::post('pago', [PagosController::class, 'pagar']);
         Route::get('mis-pedidos', [PedidoController::class, 'misPedidos']);
+        Route::post('/favorito/{id}', [FavoritoController::class, 'toggle']);
+        Route::get('/mis-favoritos', [FavoritoController::class, 'index']);
     });
     
     Route::get('productos', [FeProductosController::class, 'search']);

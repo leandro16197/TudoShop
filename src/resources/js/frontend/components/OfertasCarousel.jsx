@@ -7,7 +7,22 @@ export default function OfertasCarousel() {
   const scrollRef = useRef(null);
 
   useEffect(() => {
-    fetch('/api/frontend/v1/productos/ofertas')
+    setLoading(true);
+    
+    const token = sessionStorage.getItem("token");
+    const headers = {
+      "Accept": "application/json",
+      "Content-Type": "application/json"
+    };
+
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    fetch('/api/frontend/v1/productos/ofertas', {
+      method: 'GET',
+      headers: headers
+    })
       .then(res => res.json())
       .then(data => {
         setProductosOferta(data);

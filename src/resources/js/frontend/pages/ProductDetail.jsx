@@ -1,27 +1,36 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useCart } from '../context/CartContext'; // Importamos el hook del carrito
+import { useCart } from '../context/CartContext';
 import FeaturedProductCard from '../components/ProductCard';
 import Footer from "../components/Footer";
 
 export default function ProductDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { addToCart } = useCart(); // Extraemos la función global
-
+    const { addToCart } = useCart();
     const [product, setProduct] = useState(null);
     const [activeImage, setActiveImage] = useState(null);
     const [related, setRelated] = useState([]);
     const [loadingRelated, setLoadingRelated] = useState(false);
     const [quantity, setQuantity] = useState(1);
+    const [isFavorite, setIsFavorite] = useState(false);
 
     useEffect(() => {
         window.scrollTo(0, 0);
         setProduct(null);
         setRelated([]);
         setActiveImage(null);
+        setIsFavorite(false);
+        const token = sessionStorage.getItem('token');
+        const headers = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        };
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
 
-        fetch(`/api/frontend/v1/productos/${id}`)
+        fetch(`/api/frontend/v1/productos/${id}`, { headers })
             .then(res => {
                 if (!res.ok) throw new Error('Error cargando producto');
                 return res.json();
@@ -30,11 +39,12 @@ export default function ProductDetail() {
                 setProduct(data);
                 setActiveImage(data.images?.[0] ?? null);
                 setQuantity(1);
+                setIsFavorite(!!data.is_favorite);
                 
                 const categoriaId = data.categorias?.[0]?.id;
                 if (categoriaId) {
                     setLoadingRelated(true);
-                    fetch(`/api/frontend/v1/productos/categoria/${categoriaId}`)
+                    fetch(`/api/frontend/v1/productos/categoria/${categoriaId}`, { headers })
                         .then(res => {
                             if (!res.ok) throw new Error('Error en relacionados');
                             return res.json();
@@ -53,14 +63,47 @@ export default function ProductDetail() {
     const handleAddToCart = async () => {
         try {
             await addToCart(product, quantity);
-            
             console.log("Producto agregado y carrito actualizado");
         } catch (error) {
-
             if (error.message.includes("sesión")) {
                 navigate("/login");
             }
             console.error("Error al agregar:", error.message);
+        }
+    };
+
+
+    const toggleFavorite = async (e) => {
+        e.stopPropagation();
+
+        const token = sessionStorage.getItem('token'); 
+        if (!token) {
+            navigate("/login");
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/frontend/v1/favorito/${id}`, {
+                method: 'POST', 
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (response.status === 401) {
+                sessionStorage.removeItem('token')
+                navigate("/login");
+                return;
+            }
+
+            if (response.ok) {
+                const data = await response.json();
+                setIsFavorite(data.is_favorite); 
+            }
+        } catch (error) {
+            console.error("Error al gestionar favorito:", error);
         }
     };
 
@@ -91,8 +134,37 @@ export default function ProductDetail() {
                                     />
                                 ))}
                             </div>
-                            <div className="main-image main-image--compact">
+                            
+                          <div className="main-image main-image--compact" style={{ position: 'relative' }}>
                                 <img src={activeImage || '/images/no-image.webp'} alt={product.name} />
+                                
+                                <button 
+                                    onClick={toggleFavorite}
+                                    style={{
+                                        position: 'absolute',
+                                        top: '15px',
+                                        right: '15px',
+                                        background: 'white',
+                                        border: 'none',
+                                        borderRadius: '50%',
+                                        width: '40px',
+                                        height: '40px',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
+                                        cursor: 'pointer',
+                                        zIndex: 10
+                                    }}
+                                >
+                                    <i 
+                                        className={`bi ${isFavorite ? 'bi-star-fill' : 'bi-star'}`} 
+                                        style={{ 
+                                            color: isFavorite ? '#ffc107' : '#ccc', 
+                                            fontSize: '1.4rem' 
+                                        }}
+                                    ></i>
+                                </button>
                             </div>
                         </div>
 
@@ -190,52 +262,48 @@ export default function ProductDetail() {
             {related.length > 0 && (
                 <div className="related-outer-wrapper">
                     <div className="related-container">
-                    <section className="related-section">
-
-                        <div className="related-header">
-                        <h2>Productos relacionados</h2>
-                        </div>
-
-                        {loadingRelated ? (
-                        <div className="loader-mini"></div>
-                        ) : (
-                        <div className="related-carousel-wrapper">
-
-                            <button
-                            className="related-carousel-btn left"
-                            onClick={() => {
-                                document.querySelector('.related-carousel-track')
-                                .scrollBy({ left: -300, behavior: 'smooth' });
-                            }}
-                            >
-                            ‹
-                            </button>
-
-                            <div className="related-carousel-track">
-                            {related.map(item => (
-                                <div className="related-carousel-item" key={item.id}>
-                                <FeaturedProductCard product={item} />
-                                </div>
-                            ))}
+                        <section className="related-section">
+                            <div className="related-header">
+                                <h2>Productos relacionados</h2>
                             </div>
 
-                            <button
-                            className="related-carousel-btn right"
-                            onClick={() => {
-                                document.querySelector('.related-carousel-track')
-                                .scrollBy({ left: 300, behavior: 'smooth' });
-                            }}
-                            >
-                            ›
-                            </button>
+                            {loadingRelated ? (
+                                <div className="loader-mini"></div>
+                            ) : (
+                                <div className="related-carousel-wrapper">
+                                    <button
+                                        className="related-carousel-btn left"
+                                        onClick={() => {
+                                            document.querySelector('.related-carousel-track')
+                                            .scrollBy({ left: -300, behavior: 'smooth' });
+                                        }}
+                                    >
+                                        ‹
+                                    </button>
 
-                        </div>
-                        )}
+                                    <div className="related-carousel-track">
+                                        {related.map(item => (
+                                            <div className="related-carousel-item" key={item.id}>
+                                                <FeaturedProductCard product={item} />
+                                            </div>
+                                        ))}
+                                    </div>
 
-                    </section>
+                                    <button
+                                        className="related-carousel-btn right"
+                                        onClick={() => {
+                                            document.querySelector('.related-carousel-track')
+                                            .scrollBy({ left: 300, behavior: 'smooth' });
+                                        }}
+                                    >
+                                        ›
+                                    </button>
+                                </div>
+                            )}
+                        </section>
                     </div>
                 </div>
-                )}
+            )}
             <Footer />
         </div>
     );

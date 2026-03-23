@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import MisPedidos from '../components/MisPedidos';
+import MisFavoritos from '../components/MisFavoritos';
 import { useLocation } from 'react-router-dom';
 
 export default function Perfil() {
@@ -14,6 +15,7 @@ export default function Perfil() {
     const [loading, setLoading] = useState(true);
 
     const [tabActual, setTabActual] = useState(location.state?.tab || 'perfil');
+
     useEffect(() => {
         if (location.state?.tab) {
             setTabActual(location.state.tab);
@@ -123,11 +125,18 @@ export default function Perfil() {
                         >
                             📦 Mis Pedidos
                         </button>
+                        <button 
+                            className={`nav-item ${tabActual === 'favoritos' ? 'active' : ''}`}
+                            onClick={() => setTabActual('favoritos')}
+                        >
+                            ❤️ Mis Favoritos
+                        </button>
                     </nav>
                 </div>
             </aside>
+
             <main className="perfil-content">
-                {tabActual === 'perfil' ? (
+                {tabActual === 'perfil' && (
                     <div className="form-card">
                         <h2>Configuración de la Cuenta</h2>
                         <p className="subtitle">Gestione sus datos personales y seguridad</p>
@@ -159,9 +168,11 @@ export default function Perfil() {
                             <button type="submit" className="btn-save">ACTUALIZAR DATOS</button>
                         </form>
                     </div>
-                ) : (
-                    <MisPedidos />
                 )}
+
+                {tabActual === 'pedidos' && <MisPedidos />}
+                
+                {tabActual === 'favoritos' && <MisFavoritos />}
             </main>
         </div>
     );

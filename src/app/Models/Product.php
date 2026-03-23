@@ -54,4 +54,14 @@ class Product extends Model
             'pedido_id'
         )->withPivot('cantidad');
     }
+
+    public function favoritos()
+    {
+        return $this->belongsToMany(
+            User::class, 
+            'cliente_producto_favorito',
+            'producto_id',
+            'user_id'
+        );
+    }
 }

@@ -8,7 +8,7 @@ export default defineConfig({
         port: 5173,
         strictPort: true,
         hmr: {
-            host: '931e-152-170-28-108.ngrok-free.app',
+            host: '63cd-152-170-28-108.ngrok-free.app',
             protocol: 'wss',
         },
     },

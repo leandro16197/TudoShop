@@ -9,12 +9,25 @@ export default function FeaturedProductsCarousel() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setLoading(true); 
-    fetch("api/frontend/v1/destacados")
+    setLoading(true);
+    const token = sessionStorage.getItem("token"); 
+    const headers = {
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+    };
+
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+
+    fetch("api/frontend/v1/destacados", {
+      method: "GET",
+      headers: headers
+    })
       .then(res => res.json())
       .then(data => {
         setProducts(data);
-        setLoading(false); 
+        setLoading(false);
       })
       .catch(() => {
         setProducts([]);

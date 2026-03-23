@@ -24,5 +24,14 @@ class Cliente extends Authenticatable
     ];
 
 
+    public function favoritos()
+    {
+        return $this->belongsToMany(
+            Product::class, 
+            'cliente_producto_favorito', 
+            'user_id',
+            'producto_id'
+        )->withTimestamps();
+    }
 
 }

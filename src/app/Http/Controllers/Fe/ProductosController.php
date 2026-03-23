@@ -4,14 +4,17 @@ namespace App\Http\Controllers\Fe;
 
 use App\Http\Controllers\Controller;
 use App\Models\Categoria;
+use App\Models\Cliente;
 use App\Models\Marca;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use App\Traits\CalculadorDescuentos;
+use Illuminate\Support\Facades\Auth;
 
 class ProductosController extends Controller
 {
     use CalculadorDescuentos;
+
 
     public function search(Request $request)
     {   
@@ -47,28 +50,33 @@ class ProductosController extends Controller
 
     public function detail($id)
     {
-
         $product = Product::with(['imagenes', 'categorias', 'marcas'])->findOrFail($id);
 
         $precioFinal = $this->calcularPrecioFinal($product, 1);
         $tieneDescuento = $precioFinal < $product->price;
+        $user = auth('sanctum')->user(); 
+        $isFavorite = false;
+        if ($user instanceof \App\Models\Cliente) {
+            $isFavorite = $user->favoritos()->where('producto_id', $id)->exists();
+        }
 
         return response()->json([
-            'id'          => $product->id,
-            'name'        => $product->name,
-            'price'       => (float) $precioFinal, 
+            'id'             => $product->id,
+            'name'           => $product->name,
+            'price'          => (float) $precioFinal, 
             'original_price' => $tieneDescuento ? (float) $product->price : null, 
-            'has_discount' => $tieneDescuento,
-            'stock'       => $product->stock,
-            'description' => $product->description,
-            'categorias'  => $product->categorias->map(fn ($cat) => [
+            'has_discount'   => $tieneDescuento,
+            'is_favorite'    => $isFavorite, 
+            'stock'          => $product->stock,
+            'description'    => $product->description,
+            'categorias'     => $product->categorias->map(fn ($cat) => [
                 'id'   => $cat->id,
                 'name' => $cat->name
             ]),
-            'images'      => $product->imagenes->map(fn ($img) =>
+            'images'         => $product->imagenes->map(fn ($img) =>
                 asset('storage/' . $img->imagen)
             ),
-            'features'    => [
+            'features'       => [
                 'Marca' => $product->marca ? $product->marca->nombre : 'Sin marca',
             ],
         ]);
@@ -76,13 +84,16 @@ class ProductosController extends Controller
 
     public function featured()
     {
+        $user = auth('sanctum')->user();
         $productos = Product::with(['imagenPrincipal', 'categorias', 'marcas'])
             ->where('active', 1)
+            ->withExists(['favoritos as is_favorite' => function ($query) use ($user) {
+                $query->where('user_id', $user ? $user->id : null);
+            }])
             ->orderBy('created_at', 'desc')
             ->take(10)
             ->get()
             ->map(function ($producto) {
-
                 $imagen = $producto->imagenPrincipal
                     ? asset('storage/' . $producto->imagenPrincipal->imagen)
                     : null;
@@ -98,12 +109,12 @@ class ProductosController extends Controller
                     'has_discount'   => $tieneDescuento,
                     'stock'          => $producto->stock,
                     'imagen'         => $imagen,
+                    'is_favorite'    => (bool) $producto->is_favorite, 
                 ];
             });
 
         return response()->json($productos);
     }
-
 
     public function byCategory($categoriaId)
     {
@@ -222,9 +233,13 @@ class ProductosController extends Controller
 
     public function ofertas()
     {
-        \Log::debug("ofertas");
+        $user = auth('sanctum')->user();
+        \Log::debug($user);
         $productos = Product::with(['imagenPrincipal', 'categorias', 'marcas'])
             ->where('active', 1)
+            ->withExists(['favoritos as is_favorite' => function ($query) use ($user) {
+                $query->where('user_id', $user ? $user->id : null);
+            }])
             ->get()
             ->filter(function ($producto) {
                 $precioFinal = $this->calcularPrecioFinal($producto, 1);
@@ -246,6 +261,7 @@ class ProductosController extends Controller
                     'has_discount'   => $tieneDescuento,
                     'stock'          => $producto->stock,
                     'imagen'         => $imagen,
+                    'is_favorite'    => (bool) $producto->is_favorite, 
                 ];
             })
             ->values();
