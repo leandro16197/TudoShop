@@ -38,6 +38,16 @@
     <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/tom-select/dist/js/tom-select.complete.min.js"></script>
     <script src="{{ asset('js/appCustom.js') }}"></script>
+    <script>
+        $(document).ready(function() {
+            @if(session('success'))
+                appCustom.smallBox('ok', "{{ session('success') }}", null, 3000);
+            @endif
+            @if(session('error'))
+                appCustom.smallBox('nok', "{{ session('error') }}", null, 5000);
+            @endif
+        });
+    </script>
     @stack('scripts')
 </body>
 </html>

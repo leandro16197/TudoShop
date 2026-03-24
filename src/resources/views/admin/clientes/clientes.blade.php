@@ -1,7 +1,20 @@
 @extends('admin.layouts.base')
 
 @section('header')
-<h2 class="fw-bold">Clientes</h2>
+<div class="container-fluid pt-4 px-3">
+    <div class="d-flex align-items-center justify-content-between mb-2">
+        <h2 class="fw-bold mb-0 text-gray-800">
+            <i class="bi bi-people text-primary me-3"></i>Gestión de Clientes
+        </h2>
+        <button type="button" 
+                class="btn btn-primary btn-sm d-flex align-items-center" 
+                data-bs-toggle="modal" 
+                data-bs-target="#modalCliente">
+            <i class="bi bi-plus-lg me-2"></i> Nuevo Cliente
+        </button>
+    </div>
+    <hr class="my-3 text-gray-200">
+</div>
 @endsection
 <style>
     #loadingGif{
@@ -9,14 +22,7 @@
     }
 </style>
 @section('content')
-    <div class="d-flex justify-content-end mb-3">
-        <button type="button"
-                class="btn btn-primary"
-                data-bs-toggle="modal"
-                data-bs-target="#createOfertaModal">
-            <i class="bi bi-tags"></i> Nuevo Cliente
-        </button>
-    </div>
+
     <div class="card shadow-sm">
         <div class="card-body">
             <table id="clientesTable"

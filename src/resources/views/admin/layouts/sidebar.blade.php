@@ -38,7 +38,7 @@
                         <li>
                             <a href="{{ route('admin.productos.productos') }}"
                             class="nav-link ps-4 {{ request()->routeIs('admin.productos.*') ? 'active' : '' }}">
-                                <i class="bi bi-list-ul me-2"></i> Listado
+                                <i class="bi bi-list-ul me-2"></i> Productos
                             </a>
                         </li>
                         <li>
@@ -155,6 +155,38 @@
                             <a href="{{ route('admin.configuracion.general') }}"
                             class="nav-link ps-4 {{ request()->routeIs('admin.configuracion.general') ? 'active' : '' }}">
                                 <i class="bi bi-sliders me-2"></i> General
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.usuarios.index') }}"
+                            class="nav-link ps-4 {{ request()->routeIs('admin.usuarios.index') ? 'active' : '' }}">
+                                <i class="bi bi-people me-2"></i> Usuarios
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link d-flex justify-content-between align-items-center {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}"
+                data-bs-toggle="collapse"
+                href="#rolesSubmenu"
+                role="button"
+                aria-expanded="{{ request()->routeIs('admin.roles.*') ? 'true' : 'false' }}"
+                aria-controls="rolesSubmenu">
+                    <span>
+                        <i class="bi bi-shield-lock me-2"></i> Permisos
+                    </span>
+                    <i class="bi bi-chevron-down toggle-icon"></i>
+                </a>
+
+                <div class="collapse {{ request()->routeIs('admin.roles.*') ? 'show' : '' }}"
+                    id="rolesSubmenu"
+                    style="margin-left:20px; margin-top:5px;">
+                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                        <li>
+                            <a href="{{ route('admin.roles.index') }}"
+                            class="nav-link ps-4 {{ request()->routeIs('admin.roles.index') ? 'active' : '' }}">
+                                <i class="bi bi-person-badge me-2"></i> Gestionar Roles
                             </a>
                         </li>
                     </ul>

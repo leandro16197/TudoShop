@@ -1,4 +1,4 @@
-<div class="modal fade" id="createCategoryModal" tabindex="-1">
+<div class="modal fade" id="createCategoryModal" tabindex="-1" style="display: none;">
   <div class="modal-dialog modal-sm">
     <div class="modal-content bg-dark text-light border-secondary">
 

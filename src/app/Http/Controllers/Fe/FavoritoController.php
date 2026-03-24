@@ -20,19 +20,21 @@ class FavoritoController extends Controller
         }
 
         $favoritos = $user->favoritos()
-            ->with(['imagenes', 'marcas']) 
-            ->get()
-            ->map(function ($product) {
-                return [
-                    'id'    => $product->id,
-                    'name'  => $product->name,
-                    'price' => (float) $product->price,
-                    'image' => $product->imagenes->first() 
-                        ? asset('storage/' . $product->imagenes->first()->imagen) 
-                        : asset('images/placeholder.png'),
-                    'marca' => $product->marcas ? $product->marcas->nombre : 'Sin marca',
-                ];
-            });
+        ->with(['imagenes', 'marcas']) 
+        ->get()
+        ->map(function ($product) {
+            $marca = $product->marcas->first();
+
+            return [
+                'id'    => $product->id,
+                'name'  => $product->name,
+                'price' => (float) $product->price,
+                'image' => $product->imagenes->first() 
+                    ? asset('storage/' . $product->imagenes->first()->imagen) 
+                    : asset('images/placeholder.png'),
+                'marca' => $marca ? $marca->nombre : 'Sin marca',
+            ];
+        });
 
         return response()->json($favoritos);
     }
@@ -42,7 +44,6 @@ class FavoritoController extends Controller
     {
         /** @var Cliente $user */
         $user = Auth::user(); 
-
         if (!$user instanceof Cliente) {
             return response()->json(['message' => 'Sesión inválida'], 401);
         }

@@ -32,12 +32,7 @@ class Product extends Model
     }
     public function categorias()
     {
-        return $this->belongsToMany(
-            Categoria::class,
-            'categoria_producto',
-            'producto_id',
-            'categoria_id'
-        );
+        return $this->belongsToMany(Categoria::class, 'categoria_producto','producto_id','categoria_id');
     }
     
     public function marcas()
@@ -47,21 +42,11 @@ class Product extends Model
 
     public function pedidos()
     {
-        return $this->belongsToMany(
-            Pedido::class, 
-            'pedidos_productos', 
-            'producto_id', 
-            'pedido_id'
-        )->withPivot('cantidad');
+        return $this->belongsToMany( Pedido::class, 'pedidos_productos', 'producto_id','pedido_id')->withPivot('cantidad');
     }
 
     public function favoritos()
     {
-        return $this->belongsToMany(
-            User::class, 
-            'cliente_producto_favorito',
-            'producto_id',
-            'user_id'
-        );
+        return $this->belongsToMany(Cliente::class, 'cliente_producto_favorito', 'producto_id', 'user_id');
     }
 }

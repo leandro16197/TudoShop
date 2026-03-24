@@ -7,7 +7,7 @@ import Footer from "../components/Footer";
 export default function ProductDetail() {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { addToCart } = useCart();
+    const { cart,addToCart } = useCart();
     const [product, setProduct] = useState(null);
     const [activeImage, setActiveImage] = useState(null);
     const [related, setRelated] = useState([]);
@@ -60,15 +60,18 @@ export default function ProductDetail() {
             .catch(err => console.error(err));
     }, [id]);
 
-    const handleAddToCart = async () => {
+
+    const handleAddToCart = async (replace = false) => {
         try {
-            await addToCart(product, quantity);
-            console.log("Producto agregado y carrito actualizado");
+            await addToCart(product, quantity, replace); 
+            
+            console.log(replace ? "Cantidad fijada" : "Producto sumado al carrito");
         } catch (error) {
-            if (error.message.includes("sesión")) {
+            if (error.message.includes("sesión") || error.message.includes("autenticado")) {
                 navigate("/login");
             }
             console.error("Error al agregar:", error.message);
+            throw error;
         }
     };
 
@@ -138,31 +141,9 @@ export default function ProductDetail() {
                           <div className="main-image main-image--compact" style={{ position: 'relative' }}>
                                 <img src={activeImage || '/images/no-image.webp'} alt={product.name} />
                                 
-                                <button 
-                                    onClick={toggleFavorite}
-                                    style={{
-                                        position: 'absolute',
-                                        top: '15px',
-                                        right: '15px',
-                                        background: 'white',
-                                        border: 'none',
-                                        borderRadius: '50%',
-                                        width: '40px',
-                                        height: '40px',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        boxShadow: '0 2px 10px rgba(0,0,0,0.2)',
-                                        cursor: 'pointer',
-                                        zIndex: 10
-                                    }}
-                                >
+                                <button onClick={toggleFavorite}className="fav-btn-container"aria-label={isFavorite ? "Quitar de favoritos" : "Agregar a favoritos"}> 
                                     <i 
-                                        className={`bi ${isFavorite ? 'bi-star-fill' : 'bi-star'}`} 
-                                        style={{ 
-                                            color: isFavorite ? '#ffc107' : '#ccc', 
-                                            fontSize: '1.4rem' 
-                                        }}
+                                        className={`bi ${isFavorite ? 'bi-star-fill active' : 'bi-star'} fav-icon-star`}
                                     ></i>
                                 </button>
                             </div>
@@ -200,13 +181,8 @@ export default function ProductDetail() {
                                                 +
                                             </button>
                                         </div>
-
-                                        <button
-                                            type="button"
-                                            className="btn-icono-carrito"
-                                            onClick={handleAddToCart}
-                                            title="Agregar al carrito"
-                                        >
+            
+                                        <button type="button" className="btn-icono-carrito" onClick={() => handleAddToCart(false)} title="Agregar al carrito">
                                             <i className="bi bi-cart3"></i>
                                         </button>
                                     </>
@@ -243,8 +219,12 @@ export default function ProductDetail() {
                             <button 
                                 className="details-btn"
                                 onClick={async () => {
-                                    await handleAddToCart(); 
-                                    navigate("/checkout");
+                                    try {
+                                        await handleAddToCart(true); 
+                                        navigate("/checkout");
+                                    } catch (err) {
+                                        console.error("Error al comprar ahora:", err.message);
+                                    }
                                 }}
                             >
                                 COMPRAR AHORA

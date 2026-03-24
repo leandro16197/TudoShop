@@ -1,4 +1,4 @@
-<div class="modal fade" id="deleteProductModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="deleteProductModal" tabindex="-1" aria-hidden="true" style="display: none;">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content bg-dark text-light border border-secondary">
       <div class="modal-header border-secondary">

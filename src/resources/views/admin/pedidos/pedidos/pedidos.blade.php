@@ -1,7 +1,17 @@
 @extends('admin.layouts.base')
 
 @section('header')
-<h2 class="fw-bold">Gestión de Pedidos</h2>
+<div class="container-fluid pt-4 px-3">
+    <div class="d-flex align-items-center justify-content-between mb-2">
+        <h2 class="fw-bold mb-0 text-gray-800">
+            <i class="bi bi-cart-check text-primary me-3"></i>Gestión de Pedidos
+        </h2>
+        <div class="text-muted small">
+            <i class="bi bi-info-circle me-1"></i> Visualizando pedidos recientes
+        </div>
+    </div>
+    <hr class="my-3 text-gray-200">
+</div>
 @endsection
 
 @section('content')

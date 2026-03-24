@@ -13,10 +13,13 @@ class PedidoController extends Controller
 {
     public function agregarProducto(Request $request)
     {   
+
         $request->validate([
             'producto_id' => 'required|exists:productos,id',
-            'cantidad' => 'required|integer|min:1'
+            'cantidad'    => 'required|integer|min:1',
+            'replace'     => 'nullable|boolean' 
         ]);
+
         $user = Auth::user(); 
         if (!$user) {
             return response()->json(['message' => 'No autenticado'], 401);
@@ -25,36 +28,43 @@ class PedidoController extends Controller
         $pedido = Pedido::firstOrCreate(
             [
                 'user_id' => $user->id,
-                'estado' => 'pendiente'
+                'estado'  => 'pendiente'
             ],
             [
                 'email' => $user->email
             ]
         );
 
+
         $detalle = PedidoProducto::where('pedido_id', $pedido->id)
             ->where('producto_id', $request->producto_id)
             ->first();
 
         if ($detalle) {
-            $detalle->cantidad += $request->cantidad;
+            if ($request->replace) {
+                $detalle->cantidad = $request->cantidad;
+            } else {
+                $detalle->cantidad += $request->cantidad;
+            }
             $detalle->save();
         } else {
             PedidoProducto::create([
-                'pedido_id' => $pedido->id,
+                'pedido_id'   => $pedido->id,
                 'producto_id' => $request->producto_id,
-                'cantidad' => $request->cantidad
+                'cantidad'    => $request->cantidad
             ]);
         }
 
         return response()->json([
             'ok' => true,
-            'pedido_id' => $pedido->id
+            'pedido_id' => $pedido->id,
+            'message' => 'Producto procesado correctamente'
         ]);
     }
+
     public function obtenerCarrito($id = null)
     {
-        $user = \Auth::user();
+        $user = Auth::user();
 
         if ($id) {
 

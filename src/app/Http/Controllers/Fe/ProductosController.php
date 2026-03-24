@@ -96,10 +96,10 @@ class ProductosController extends Controller
             ->map(function ($producto) {
                 $imagen = $producto->imagenPrincipal
                     ? asset('storage/' . $producto->imagenPrincipal->imagen)
-                    : null;
+                    : asset('images/no-image.png');
 
                 $precioFinal = $this->calcularPrecioFinal($producto, 1);
-                $tieneDescuento = $precioFinal < $producto->price;
+                $tieneDescuento = (float)$precioFinal < (float)$producto->price;
 
                 return [
                     'id'             => $producto->id,
@@ -115,7 +115,6 @@ class ProductosController extends Controller
 
         return response()->json($productos);
     }
-
     public function byCategory($categoriaId)
     {
         $productos = Product::whereHas('categorias', function ($query) use ($categoriaId) {
@@ -234,7 +233,6 @@ class ProductosController extends Controller
     public function ofertas()
     {
         $user = auth('sanctum')->user();
-        \Log::debug($user);
         $productos = Product::with(['imagenPrincipal', 'categorias', 'marcas'])
             ->where('active', 1)
             ->withExists(['favoritos as is_favorite' => function ($query) use ($user) {

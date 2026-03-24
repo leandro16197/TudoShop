@@ -40,11 +40,13 @@ export function CartProvider({ children }) {
         return () => window.removeEventListener("authChange", fetchCart);
     }, []);
 
-    const addToCart = async (product, quantity = 1) => {
+    const addToCart = async (product, quantity = 1, replace = false) => {
       try {
           const token = sessionStorage.getItem("token");
-          console.log("TOKEN:", token);
-          if (!token) { return; } 
+          if (!token) { 
+
+              throw new Error("No hay sesión activa");
+          } 
 
           const response = await fetch("/api/frontend/v1/pedidos/agregar-producto", {
               method: "POST",
@@ -56,6 +58,7 @@ export function CartProvider({ children }) {
               body: JSON.stringify({
                   producto_id: product.id, 
                   cantidad: quantity,
+                  replace: replace, 
               }),
           });
 
@@ -68,15 +71,13 @@ export function CartProvider({ children }) {
           }
 
           if (!response.ok) throw new Error(data.message || "Error al agregar");
-
           await fetchCart(); 
           return data;
       } catch (error) {
           console.error("Error:", error.message);
           throw error;
       }
-  };
-
+    };
     const removeFromCart = async (productoId) => {
         const token = sessionStorage.getItem("token");
         if (!token) return;

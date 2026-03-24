@@ -1,4 +1,4 @@
-<div class="modal fade" id="createMarcaModal" tabindex="-1" aria-labelledby="createMarcaModalLabel" aria-hidden="true">
+<div class="modal fade" id="createMarcaModal" tabindex="-1" aria-labelledby="createMarcaModalLabel" aria-hidden="true"style="display: none;">
   <div class="modal-dialog">
     <div class="modal-content bg-dark text-light border-secondary">
       

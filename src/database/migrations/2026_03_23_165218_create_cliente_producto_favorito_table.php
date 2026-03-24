@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('cliente_producto_favorito', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('clientes')->onDelete('cascade');
+            
             $table->foreignId('producto_id')->constrained('productos')->onDelete('cascade');
             $table->timestamps();
+            
             $table->unique(['user_id', 'producto_id']);
         });
     }

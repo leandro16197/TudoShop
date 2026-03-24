@@ -1,5 +1,5 @@
 
-<div class="modal fade" id="createOfertaModal" tabindex="-1" aria-labelledby="createOfertaModalLabel" aria-hidden="true">
+<div class="modal fade" id="createOfertaModal" tabindex="-1" aria-labelledby="createOfertaModalLabel" aria-hidden="true" style="display: none;">
   <div class="modal-dialog">
     <div class="modal-content bg-dark text-light border-secondary">
       
