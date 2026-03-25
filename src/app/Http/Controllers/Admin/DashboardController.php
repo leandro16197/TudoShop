@@ -16,24 +16,30 @@ class DashboardController extends Controller
     public function metricas()
     {
         $hoy = Carbon::today();
+        $haceUnaSemana = Carbon::now()->subDays(7);
 
-        $ventasHoy = Pagos::whereDate('created_at', $hoy)->sum('total');
         $pedidosHoy = Pedido::whereDate('created_at', $hoy)->count();
         $clientesHoy = Cliente::whereDate('created_at', $hoy)->count();
         $pedidosPendientes = Pedido::where('estado', 'pendiente')->count();
+
+        $productosBajoStock = Product::where('stock', '<=', 5)
+            ->select('name', 'stock') 
+            ->get();
         $topProductos = PedidoProducto::selectRaw('productos.name, SUM(pedidos_productos.cantidad) as total_vendidos')
             ->join('productos', 'pedidos_productos.producto_id', '=', 'productos.id')
-            ->groupBy('productos.name')
+            ->where('pedidos_productos.created_at', '>=', $haceUnaSemana)
+            ->groupBy('productos.name', 'productos.id')
             ->orderByDesc('total_vendidos')
             ->limit(3)
             ->get();
 
         return response()->json([
-            'ventas_hoy' => $ventasHoy,
-            'pedidos_hoy' => $pedidosHoy,
-            'clientes_hoy' => $clientesHoy,
+            'pedidos_hoy'        => $pedidosHoy,
+            'clientes_hoy'       => $clientesHoy,
             'pedidos_pendientes' => $pedidosPendientes,
-            'top_productos' => $topProductos
+            'stock_critico'      => $productosBajoStock->count(),
+            'productos_detalles' => $productosBajoStock,        
+            'top_productos'      => $topProductos
         ]);
     }
     public function ventasMes()

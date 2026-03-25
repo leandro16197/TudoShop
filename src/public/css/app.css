@@ -554,3 +554,64 @@ body {
 .border-bottom.border-4 {
     border-bottom-width: 4px !important;
 }
+
+
+/* Contenedor del Ranking */
+.ranking-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding-top: 10px;
+}
+
+/* Cada ítem del ranking */
+.ranking-item {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.03); 
+    border-radius: 8px;
+    padding: 10px 15px;
+    transition: transform 0.2s, background 0.2s;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ranking-item:hover {
+    background: rgba(255, 255, 255, 0.07);
+    transform: translateX(5px);
+}
+
+.ranking-pos {
+    font-weight: 800;
+    font-size: 1.1rem;
+    margin-right: 15px;
+    min-width: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.pos-1 { color: #ffd700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.3); } 
+.pos-2 { color: #e2e8f0; } 
+.pos-3 { color: #cd7f32; } 
+
+
+.ranking-name {
+    flex-grow: 1;
+    color: #e2e8f0;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ranking-count {
+    background: rgba(59, 130, 246, 0.1);
+    color: #60a5fa;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-weight: bold;
+    font-size: 0.85rem;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+

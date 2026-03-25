@@ -24,6 +24,34 @@
 @section('content')
     <div class="card shadow-sm">
         <div class="card-body">
+            <div id="contenedorFiltrosProductos" class="d-none">
+                <div class="d-flex align-items-center gap-2">
+                    <select id="filterStock" class="form-select form-select-sm" style="width: 130px;">
+                        <option value="">Todos (Stock)</option>
+                        <option value="con_stock">Con Stock</option>
+                        <option value="sin_stock">Sin Stock</option>
+                    </select>
+
+                    <select id="filterCategoria" class="form-select form-select-sm" style="width: 150px;">
+                        <option value="">Categoría</option>
+                        @foreach($categorias as $cat)
+                            <option value="{{ $cat->id }}">{{ $cat->nombre }}</option>
+                        @endforeach
+                    </select>
+
+                    <select id="filterMarca" class="form-select form-select-sm" style="width: 150px;">
+                        <option value="">Marca</option>
+                        @foreach($marcas as $marca)
+                            <option value="{{ $marca->id }}">{{ $marca->nombre }}</option>
+                        @endforeach
+                    </select>
+
+                    <button type="button" id="btnResetFilters" class="btn btn-outline-secondary btn-sm" title="Limpiar Filtros">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                </div>
+            </div>
+
             <table id="productsTable" data-url="{{ route('admin.productos.productos') }}" style="width: 100%">
                 <thead>
                     <tr>
@@ -32,6 +60,7 @@
                         <th>Imagen</th>
                         <th>Descripción</th>
                         <th>Categoría</th>
+                        <th>Marca</th>
                         <th>Precio</th>
                         <th>Stock</th>
                         <th>Activo</th>

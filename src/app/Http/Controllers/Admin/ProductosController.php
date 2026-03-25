@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Categoria;
 use App\Models\CategoriaProducto;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Imagen;
+use App\Models\Marca;
 use Illuminate\Support\Facades\Storage;
 
 class ProductosController extends Controller
@@ -15,38 +17,59 @@ class ProductosController extends Controller
 
 
     public function index(Request $request)
-    {
+    {   \Log::debug($request);
         if ($request->ajax()) {
+            $query = Product::with(['imagenPrincipal', 'categorias', 'marcas'])
+                ->select('id', 'name', 'description', 'price', 'stock', 'active');
 
-            $products = Product::with(['imagenPrincipal', 'categorias'])
-                ->select('id', 'name', 'description', 'price', 'stock', 'active')
-                ->get()
-                ->map(function ($product) {
-                    return [
-                        'id'          => $product->id,
-                        'name'        => $product->name,
-                        'description' => $product->description,
-                        'price'       => $product->price,
-                        'stock'       => $product->stock,
-                        'active'      => $product->active,
-                        'image' => $product->imagenPrincipal
-                                    ? asset('storage/'.$product->imagenPrincipal->imagen)
-                                    : null,
-
-                        'categorias' => $product->categorias
-                            ->pluck('nombre')
-                            ->implode(', '),
-                    ];
+            if ($request->filled('stock')) {
+                if ($request->stock === 'con_stock') {
+                    $query->where('stock', '>', 0);
+                } elseif ($request->stock === 'sin_stock') {
+                    $query->where('stock', '<=', 0);
+                }
+            }
+            if ($request->has('search') && !empty($request->input('search')['value'])) {
+                $searchValue = $request->input('search')['value'];
+                $query->where('name', 'LIKE', "%{$searchValue}%");
+            }
+            if ($request->filled('categoria_id')) {
+                $query->whereHas('categorias', function ($q) use ($request) {
+                    $q->where('categorias.id', $request->categoria_id);
                 });
+            }
+            if ($request->filled('marca_id')) {
+                $query->whereHas('marcas', function ($q) use ($request) {
+                    $q->where('marcas.id', $request->marca_id);
+                });
+            }
 
-            return response()->json([
-                'data' => $products
-            ]);
+            $products = $query->get()->map(function ($product) {
+                return [
+                    'id'           => $product->id,
+                    'name'         => $product->name,
+                    'description'  => $product->description,
+                    'price'        => $product->price,
+                    'stock'        => $product->stock,
+                    'active'       => $product->active,
+                    'image'        => $product->imagenPrincipal 
+                                        ? asset('storage/' . $product->imagenPrincipal->imagen) 
+                                        : null,
+                    'categoria_id' => $product->categorias->first()?->id,
+                    'categorias'   => $product->categorias->pluck('nombre')->implode(', '),
+                    'marca_id'     => $product->marcas->first()?->id, 
+                    'marcas'       => $product->marcas->pluck('nombre')->implode(', '),
+                ];
+            });
+
+            return response()->json(['data' => $products]);
         }
 
-        return view("{$this->viewPath}.productos");
-    }
+        $categorias = Categoria::orderBy('nombre')->get();
+        $marcas = Marca::orderBy('nombre')->get();
 
+        return view("{$this->viewPath}.productos", compact('categorias', 'marcas'));
+    }
 
 
 
@@ -62,8 +85,9 @@ class ProductosController extends Controller
             'description'  => 'nullable|string',
             'price'        => 'required|numeric|min:0',
             'stock'        => 'required|integer|min:0',
-            'active'       => 'nullable|boolean',
+            'active'       => 'nullable',
             'categoria_id' => 'required|exists:categorias,id',
+            'marca_id'     => 'required|exists:marcas,id', 
             'images.*'     => 'nullable|image|max:5120',
         ]);
 
@@ -74,19 +98,13 @@ class ProductosController extends Controller
             'stock'       => $request->stock,
             'active'      => $request->has('active'),
         ]);
-        CategoriaProducto::where('producto_id', $product->id)
-            ->delete();
 
-        CategoriaProducto::create([
-            'producto_id'  => $product->id,
-            'categoria_id' => $request->categoria_id,
-        ]);
+        $product->categorias()->sync([$request->categoria_id]);
+        $product->marcas()->sync([$request->marca_id]);
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
-
                 $path = $image->store('productos', 'public');
-
                 Imagen::create([
                     'producto_id' => $product->id,
                     'imagen'      => $path,
@@ -94,7 +112,7 @@ class ProductosController extends Controller
             }
         }
 
-        $product->load(['imagenes', 'categorias']);
+        $product->load(['imagenes', 'categorias', 'marcas']);
 
         return response()->json([
             'status'  => 'ok',
@@ -102,7 +120,6 @@ class ProductosController extends Controller
             'product' => $product,
         ]);
     }
-
     
     public function update(Request $request, $id)
     {
@@ -119,6 +136,7 @@ class ProductosController extends Controller
             'stock'        => 'required|integer|min:0',
             'active'       => 'nullable|boolean',
             'categoria_id' => 'required|exists:categorias,id',
+            'marca_id'     => 'required|exists:marcas,id', 
             'images.*'     => 'nullable|image|max:5120',
         ]);
 
@@ -130,14 +148,12 @@ class ProductosController extends Controller
             'active'      => $request->active ?? false,
         ]);
 
-
-
         $product->categorias()->sync([$request->categoria_id]);
+        $product->marcas()->sync([$request->marca_id]);
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 $path = $image->store('productos', 'public');
-
                 Imagen::create([
                     'producto_id' => $product->id,
                     'imagen'      => $path,
@@ -145,7 +161,7 @@ class ProductosController extends Controller
             }
         }
 
-        $product->load(['imagenes', 'categorias']);
+        $product->load(['imagenes', 'categorias', 'marcas']);
 
         return response()->json([
             'status'  => 'ok',

@@ -116,7 +116,22 @@
                         `
                         : ''
                 }
-            ]
+            ],
+            dom: '<"row"<"col-md-6"l><"col-md-6"f>>rtip',
+            initComplete: function() {
+                var filaNativa = $('.dataTables_wrapper .row:first-child');
+                filaNativa.addClass('d-flex justify-content-between align-items-center');
+                var divCantidad = filaNativa.find('.dataTables_length').parent();
+                var divBuscador = filaNativa.find('.dataTables_filter').parent();
+                filaNativa.prepend(divBuscador); 
+                filaNativa.append(divCantidad);  
+
+                divBuscador.removeClass('col-md-6').addClass('col-md-4 d-flex justify-content-start');
+                divCantidad.removeClass('col-md-6').addClass('col-md-4 d-flex justify-content-end align-items-center gap-2');
+                $('.dataTables_filter, .dataTables_length').css({ 'margin': '0', 'width': 'auto' });
+                $('.dataTables_filter input').addClass('form-control-sm');
+                $('.dataTables_length select').addClass('form-select-sm');
+            }
         });
 
         $('#formCreateCategory').submit(function (e) {

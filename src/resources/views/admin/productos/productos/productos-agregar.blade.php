@@ -36,6 +36,14 @@
 
               </select>
           </div>
+          <div class="mb-3">
+              <label class="form-label">Marca</label>
+              <select name="marca_id" 
+                      id="productMarcas" 
+                      class="form-select bg-dark text-light border-secondary">
+                  <option value="" selected disabled>Seleccione marca</option>
+              </select>
+          </div>
 
 
           <div class="mb-3">
@@ -86,39 +94,5 @@
   </div>
 </div>
 @push('scripts')
-<script>
-  $(document).ready(function () {
-    let categoriasSelect;
 
-    function loadCategorias(selected = null) {
-        $.get("{{ route('admin.categorias.list') }}", function (response) {
-
-            let select = $('#productCategorias');
-            select.html(`
-                <option value="" disabled ${!selected ? 'selected' : ''}>
-                    Seleccione categoría
-                </option>
-            `);
-
-            response.data.forEach(cat => {
-
-                let isSelected = selected == cat.id ? 'selected' : '';
-
-                select.append(`
-                    <option value="${cat.id}" ${isSelected}>
-                        ${cat.nombre}
-                    </option>
-                `);
-            });
-
-        });
-    }
-
-    $('#createProductModal').on('shown.bs.modal', function () {
-        loadCategorias();
-    });
-
-  });
-
-</script>
 @endpush
