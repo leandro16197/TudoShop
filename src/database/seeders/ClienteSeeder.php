@@ -13,7 +13,7 @@ class ClienteSeeder extends Seeder
     {
         $faker = Faker::create();
 
-        for ($i = 0; $i < 30; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             DB::table('clientes')->insert([
                 'nombre'     => $faker->firstName,
                 'apellido'   => $faker->lastName,

@@ -75,8 +75,14 @@ export default function Chatbot() {
                                             <div className="custom-product-list">
                                                 {m.products.map((p, idx) => (
                                                     <div key={idx} className="my-product-card">
-                                                        <span><strong>{p.name}</strong>${Number(p.price).toFixed(2)}</span>
-                                                        <button onClick={() => window.open(`/productos/${p.id}`, '_blank')}>
+                                                        <div className="product-info">
+                                                            <span className="product-name">{p.name}</span>
+                                                            <span className="product-price">${Number(p.price).toFixed(2)}</span>
+                                                        </div>
+                                                        <button 
+                                                            className="view-details-btn"
+                                                            onClick={() => window.open(`/productos/${p.id}`, '_blank')}
+                                                        >
                                                             Ver detalles
                                                         </button>
                                                     </div>

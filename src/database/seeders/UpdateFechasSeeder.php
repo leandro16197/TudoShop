@@ -10,7 +10,6 @@ class UpdateFechasSeeder extends Seeder
 {
     public function run(): void
     {
-        // Obtenemos todos los pedidos
         $pedidos = DB::table('pedidos')->get();
 
         foreach ($pedidos as $pedido) {

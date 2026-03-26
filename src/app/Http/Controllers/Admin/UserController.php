@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -44,7 +45,7 @@ class UserController extends Controller
     }
 
     public function store(Request $request)
-    {   \Log::debug($request);
+    {  
         try {
             $request->validate([
                 'name'     => 'required|string|max:255',
@@ -101,5 +102,29 @@ class UserController extends Controller
         $user->roles()->sync([$request->role_id]);
 
         return response()->json(['message' => 'Usuario y rol actualizados correctamente']);
+    }
+    public function destroy($id)
+    {
+        try {
+            if (Auth::id() == $id) {
+                return response()->json(['message' => 'No puedes eliminar tu propia cuenta'], 403);
+            }
+
+            $usuario = User::findOrFail($id);
+            
+            // 2. Ejecutar la eliminación
+            $usuario->delete();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Usuario eliminado con éxito'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No se pudo eliminar el usuario: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

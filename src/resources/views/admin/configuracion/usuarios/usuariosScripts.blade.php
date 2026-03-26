@@ -91,7 +91,7 @@ $(document).ready(function() {
         showLoading();
 
         $.ajax({
-            url: `/admin/usuarios/${userIdAEliminar}`, 
+            url: `/frontend/v2/usuarios/${userIdAEliminar}`, 
             type: 'DELETE',
             headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
             success: function(response) {
@@ -135,6 +135,7 @@ $(document).ready(function() {
             },
             success: function (response) {
                 hideLoading();
+                btnSubmit.prop('disabled', false); 
                 $('#modalUsuario').modal('hide');
                 form[0].reset();
                 if ($.fn.DataTable.isDataTable('#pedidosTable')) {

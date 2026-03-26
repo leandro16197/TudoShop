@@ -18,7 +18,7 @@ class ProductosController extends Controller
 
     public function search(Request $request)
     {   
-        $query = $request->input('q', '');
+        $query = $request->input('search', '');
         $productos = Product::with(['imagenPrincipal', 'categorias'])
             ->when($query, function ($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%")

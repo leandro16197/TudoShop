@@ -1,5 +1,4 @@
 @php
-    // Lógica de navegación (se mantiene igual, está correcta)
     $productosActive = request()->routeIs('admin.productos.*') || 
                        request()->routeIs('admin.categorias*') || 
                        request()->routeIs('admin.marcas*');

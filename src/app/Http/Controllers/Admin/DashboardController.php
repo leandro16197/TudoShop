@@ -20,8 +20,7 @@ class DashboardController extends Controller
 
         $pedidosHoy = Pedido::whereDate('created_at', $hoy)->count();
         $clientesHoy = Cliente::whereDate('created_at', $hoy)->count();
-        $pedidosPendientes = Pedido::where('estado', 'pendiente')->count();
-
+        $pedidosPendientes = Pedido::where('estado', 'pendiente')->count();   
         $productosBajoStock = Product::where('stock', '<=', 5)
             ->select('name', 'stock') 
             ->get();
@@ -35,7 +34,7 @@ class DashboardController extends Controller
 
         return response()->json([
             'pedidos_hoy'        => $pedidosHoy,
-            'clientes_hoy'       => $clientesHoy,
+            'clientes_nuevos'    => $clientesHoy,
             'pedidos_pendientes' => $pedidosPendientes,
             'stock_critico'      => $productosBajoStock->count(),
             'productos_detalles' => $productosBajoStock,        

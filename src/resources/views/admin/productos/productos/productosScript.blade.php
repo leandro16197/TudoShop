@@ -136,15 +136,11 @@
             const form = $(this)[0];
             const formData = new FormData(form);
             const editId = $(this).attr('data-edit-id');
-            if (editId) {
-                formData.append('_method', 'PUT');
-            }
-
             const url = editId
                 ? `/frontend/v2/productos/${editId}` 
                 : $(this).attr('action');           
-            showLoading();
             
+            showLoading();
             $('#createProductModal').modal('hide');
 
             $.ajax({
@@ -158,7 +154,6 @@
                 },
                 success: function () {
                     table.ajax.reload(null, false);
-
                     appCustom.smallBox(
                         'ok',
                         editId ? 'Producto actualizado con éxito' : 'Producto creado con éxito',
@@ -167,9 +162,7 @@
                     );
                 },
                 error: function (xhr) {
-
                     $('#createProductModal').modal('show');
-                    
                     let msg = 'Error al procesar la solicitud';
                     if (xhr.status === 422 && xhr.responseJSON?.errors) {
                         msg = Object.values(xhr.responseJSON.errors)[0][0];
@@ -181,8 +174,6 @@
                 }
             });
         });
-
-
         $('#productsTable').on('click', '.btn-edit', function() {
             let id = $(this).data('id');
             editProduct(id);

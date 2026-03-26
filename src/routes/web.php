@@ -78,6 +78,7 @@ Route::middleware(['auth', 'verified'])->prefix('frontend/v2')->group(function (
         Route::get('/usuarios/create', [UserController::class, 'create'])->name('admin.usuarios.create');
         Route::post('/usuarios', [UserController::class, 'store'])->name('admin.usuarios.store');
         Route::post('/usuarios/{id}', [UserController::class, 'update'])->name('admin.usuarios.update');
+        Route::delete('/usuarios/{id}', [UserController::class, 'destroy'])->name('admin.usuarios.destroy');
         Route::post('/roles', [RoleController::class, 'store'])->name('admin.roles.store');
         Route::post('/roles/{id}', [RoleController::class, 'update'])->name('admin.roles.update');
         Route::delete('/roles/{id}', [RoleController::class, 'destroy'])->name('admin.roles.destroy');

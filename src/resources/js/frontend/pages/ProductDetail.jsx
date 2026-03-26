@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import FeaturedProductCard from '../components/ProductCard';
-import Footer from "../components/Footer";
 
 export default function ProductDetail() {
     const { id } = useParams();
@@ -284,7 +283,6 @@ export default function ProductDetail() {
                     </div>
                 </div>
             )}
-            <Footer />
         </div>
     );
 }
