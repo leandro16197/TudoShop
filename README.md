@@ -31,7 +31,7 @@ Gestión de perfil, historial de pedidos, carrito de compras y lista de favorito
 
 **Backend:**  
 - PHP 8.x  
-- Laravel 10/11 (Eloquent ORM, Blade, arquitectura MVC)  
+- Laravel 12 (Eloquent ORM, Blade, arquitectura MVC)  
 
 **Frontend:**  
 - React (UI del cliente)  
